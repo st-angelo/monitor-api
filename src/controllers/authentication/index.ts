@@ -58,7 +58,10 @@ export const protect = catchAsync(async (req: Request, res, next) => {
   const { authorization } = req.headers;
   if (authorization && authorization.startsWith('Bearer')) {
     [, token] = authorization.split(' ');
+  } else {
+    token = req.cookies.jwt;
   }
+
   if (!token)
     return next(
       new AppError('You are not logged in! Please login to get access', 401)

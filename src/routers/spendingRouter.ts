@@ -1,11 +1,12 @@
 import { Router } from 'express';
-import { protect, updatePassword } from '../controllers/authentication';
+import { protect } from '../controllers/authentication';
+import { spendings } from '../controllers/spending';
 
 const router = Router();
 
 // Protect all routes that come after this middleware use
 router.use(protect);
 
-router.patch('/updatePassword', updatePassword);
+router.get('/', spendings);
 
 export default router;

@@ -25,6 +25,8 @@
   },
   "devDependencies": {
     "@types/bcryptjs": "^2.4.2",
+    "@types/cookie-parser": "^1.4.3",
+    "@types/cors": "^2.8.12",
     "@types/dotenv": "^8.2.0",
     "@types/eslint": "^8.4.1",
     "@types/eslint-plugin-prettier": "^3.1.0",
@@ -51,6 +53,8 @@
     "@automapper/core": "^7.2.1",
     "@types/jsonwebtoken": "^8.5.8",
     "bcryptjs": "^2.4.3",
+    "cookie-parser": "^1.4.6",
+    "cors": "^2.8.5",
     "date-fns": "^2.28.0",
     "dotenv": "^16.0.0",
     "express": "^4.17.2",

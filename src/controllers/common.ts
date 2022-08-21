@@ -1,6 +1,10 @@
 import { Request } from 'express';
 import { ParamsDictionary, Query } from 'express-serve-static-core';
 
+interface RequestCookies {
+  jwt: string;
+}
+
 export interface TypedRequest<
   TReqBody = any,
   TQuery = Query,
@@ -9,4 +13,5 @@ export interface TypedRequest<
   body: TReqBody;
   query: TQuery;
   params: TParams;
+  cookies: RequestCookies;
 }
