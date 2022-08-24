@@ -24,6 +24,11 @@ import {
 export const signup = catchAsync(
   async (req: Request<SignupBody>, res, next) => {
     const { firstName, lastName, email, password } = req.body;
+
+    const exists = await UserModel.exists({ email });
+    if (exists)
+      return next(new AppError('A user with this email already exists', 409));
+
     const newUser = await UserModel.create({
       firstName,
       lastName,
@@ -35,7 +40,7 @@ export const signup = catchAsync(
   }
 );
 
-export const login = catchAsync(async (req: Request<LoginBody>, res, next) => {
+export const signin = catchAsync(async (req: Request<LoginBody>, res, next) => {
   const { email, password } = req.body;
 
   // 1. Check if email and password exist
@@ -54,12 +59,10 @@ export const login = catchAsync(async (req: Request<LoginBody>, res, next) => {
 
 export const protect = catchAsync(async (req: Request, res, next) => {
   // 1. Getting token and check if exists
-  let token;
+  let token: string | null = null;
   const { authorization } = req.headers;
   if (authorization && authorization.startsWith('Bearer')) {
-    [, token] = authorization.split(' ');
-  } else {
-    token = req.cookies.jwt;
+    [, token] = authorization.split(' ').map(x => x.trim());
   }
 
   if (!token)

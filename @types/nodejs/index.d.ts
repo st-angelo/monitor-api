@@ -7,6 +7,7 @@ declare module NodeJS {
     JWT_SECRET: string;
     JWT_EXPIRES_IN: string;
     JWT_COOKIE_EXPIRES_IN: number;
+    JWT_COOKIE_SUFFIX: string;
     EMAIL_USERNAME: string;
     EMAIL_PASSWORD: string;
     CLIENT_ID: string;

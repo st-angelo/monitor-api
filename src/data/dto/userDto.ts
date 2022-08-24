@@ -1,19 +1,19 @@
-import amClasses from '@automapper/classes';
+import { AutoMap } from '@automapper/classes';
 import { ObjectId } from 'mongoose';
 
 class UserDto {
   id: ObjectId;
 
-  @amClasses.AutoMap()
+  @AutoMap()
   firstName: string;
 
-  @amClasses.AutoMap()
+  @AutoMap()
   lastName: string;
 
-  @amClasses.AutoMap()
+  @AutoMap()
   email: string;
 
-  @amClasses.AutoMap()
+  @AutoMap()
   photo: string;
 }
 

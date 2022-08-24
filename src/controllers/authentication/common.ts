@@ -1,7 +1,7 @@
 import bcrypt from 'bcryptjs';
 import crypto from 'crypto';
 import { add, format } from 'date-fns';
-import { CookieOptions, NextFunction, Response } from 'express';
+import { NextFunction, Response } from 'express';
 import jwt from 'jsonwebtoken';
 import { ObjectId } from 'mongoose';
 import UserDto from '../../data/dto/userDto.js';
@@ -20,22 +20,11 @@ export const createAndSendToken = (
   res: Response
 ) => {
   const token = signToken(user._id);
-
-  const cookieOptions: CookieOptions = {
-    expires: new Date(
-      Date.now() + process.env.JWT_COOKIE_EXPIRES_IN * 24 * 60 * 60 * 1000
-    ),
-    httpOnly: true,
-    sameSite: 'strict',
-  };
-  if (process.env.NODE_ENV === 'production') cookieOptions.secure = true;
-  res.cookie('jwt', token, cookieOptions);
-
   res.status(statusCode).json({
     status: 'success',
     token,
     data: {
-      user: mapper.map(user, UserDto, User),
+      user: mapper.map(user, User, UserDto),
     },
   });
 };

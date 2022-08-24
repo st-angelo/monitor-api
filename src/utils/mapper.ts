@@ -1,16 +1,20 @@
-import amClasses from '@automapper/classes';
-import amCore from '@automapper/core';
+import { classes } from '@automapper/classes';
+import { createMap, createMapper, forMember, mapFrom } from '@automapper/core';
 import UserDto from '../data/dto/userDto.js';
 import User from '../data/entities/user.js';
 
-const mapper = amCore.createMapper({
-  name: 'main',
-  pluginInitializer: amClasses.classes,
+const mapper = createMapper({
+  strategyInitializer: classes(),
 });
 
-mapper.createMap(User, UserDto).forMember(
-  destination => destination.id,
-  amCore.mapFrom(source => source._id)
+createMap(
+  mapper,
+  User,
+  UserDto,
+  forMember(
+    destination => destination.id,
+    mapFrom(source => source._id)
+  )
 );
 
 export default mapper;

@@ -6,9 +6,11 @@ import rateLimit from 'express-rate-limit';
 import helmet from 'helmet';
 import hpp from 'hpp';
 import xss from 'xss-clean';
+import globalErrorHandler from './controllers/error';
 import authenticationRouter from './routers/authenticationRouter.js';
 import spendingRouter from './routers/spendingRouter.js';
 import userRouter from './routers/userRouter.js';
+import { AppError } from './utils/appError.js';
 import { __dirname } from './utils/common.js';
 
 const app = express();
@@ -19,8 +21,7 @@ app.use(helmet());
 // Cors
 app.use(
   cors({
-    origin: 'http://localhost:3000',
-    credentials: true,
+    origin: ['http://localhost:3000', 'http://127.0.0.1:3000'],
   })
 );
 
@@ -62,5 +63,11 @@ app.use((req, res, next) => {
 app.use('/api/v1', authenticationRouter);
 app.use('/api/v1/user', userRouter);
 app.use('/api/v1/spending', spendingRouter);
+
+app.all('*', (req, _, next) => {
+  next(new AppError(`Can't find ${req.originalUrl}`, 404));
+});
+
+app.use(globalErrorHandler);
 
 export default app;
