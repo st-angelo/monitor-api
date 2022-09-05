@@ -14,5 +14,6 @@ declare module NodeJS {
     CLIENT_SECRET: string;
     REFRESH_TOKEN: string;
     ACCESS_TOKEN: string;
+    CURRENCY_API_URL: string;
   }
 }

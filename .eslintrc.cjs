@@ -11,22 +11,17 @@ module.exports = {
     'eslint:recommended',
     'plugin:@typescript-eslint/eslint-recommended',
     'plugin:@typescript-eslint/recommended-requiring-type-checking',
-    'prettier'
+    'prettier',
   ],
   parserOptions: {
-    project: ['./tsconfig.json']
+    project: ['./tsconfig.json'],
   },
   rules: {
     'no-debugger': 0,
     'no-alert': 0,
     'no-await-in-loop': 0,
     'no-return-assign': ['error', 'except-parens'],
-    'no-restricted-syntax': [
-      2,
-      'ForInStatement',
-      'LabeledStatement',
-      'WithStatement',
-    ],
+    'no-restricted-syntax': [2, 'ForInStatement', 'LabeledStatement', 'WithStatement'],
     'prefer-const': [
       'error',
       {
@@ -65,26 +60,16 @@ module.exports = {
         allowTemplateLiterals: true,
       },
     ],
-    'prettier/prettier': [
-      'error',
-      {
-        trailingComma: 'es5',
-        singleQuote: true,
-        printWidth: 80,
-        endOfLine: 'auto',
-        arrowParens: 'avoid',
-      },
-    ],
     'no-shadow': ['off'],
     '@typescript-eslint/no-shadow': ['error'],
     'no-unused-vars': ['off'],
     '@typescript-eslint/no-unused-vars': [
-      'error', 
+      'error',
       {
         ignoreRestSiblings: true,
         argsIgnorePattern: '^_|req|res|next',
-      }
+      },
     ],
-    '@typescript-eslint/restrict-template-expressions': ['off']
-  }
-}
+    '@typescript-eslint/restrict-template-expressions': ['off'],
+  },
+};

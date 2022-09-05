@@ -49,8 +49,7 @@ const handleValidationErrorDB = (err: mongoose.Error.ValidationError) => {
   return new AppError(message, 400);
 };
 
-const handleJWTInvalidError = () =>
-  new AppError('Invalid token. Please log in again!', 401);
+const handleJWTInvalidError = () => new AppError('Invalid token. Please log in again!', 401);
 
 const handleJWTExpiredError = () =>
   new AppError('Your token has expired. Please log in again!', 401);
@@ -67,13 +66,10 @@ export default (err: any, req: Request, res: Response, next: NextFunction) => {
   error.statusCode = error.statusCode || 500;
   error.status = error.status || 'error';
 
-  if (process.env.ENVIRONMENT === 'development')
-    sendErrorDev(error as AppError, res);
+  if (process.env.ENVIRONMENT === 'development') sendErrorDev(error as AppError, res);
   else if (process.env.ENVIRONMENT === 'production') {
-    if (error.name === 'CastError')
-      error = handleCastErrorDB(error as mongoose.Error.CastError);
-    if (error.code === 11000)
-      error = handleDuplicateFieldsDB(error as MongoError);
+    if (error.name === 'CastError') error = handleCastErrorDB(error as mongoose.Error.CastError);
+    if (error.code === 11000) error = handleDuplicateFieldsDB(error as MongoError);
     if (error.name === 'ValidationError')
       error = handleValidationErrorDB(error as mongoose.Error.ValidationError);
     if (error.name === 'JsonWebTokenError') error = handleJWTInvalidError();

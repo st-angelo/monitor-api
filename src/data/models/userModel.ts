@@ -59,13 +59,10 @@ userSchema.pre<UserDocument>('save', function (next) {
 });
 
 /* Filter out inactive users */
-userSchema.pre<mongoose.Query<User, mongoose.Document<User>>>(
-  /^find/,
-  function (next) {
-    void this.find({ active: { $ne: false } });
-    next();
-  }
-);
+userSchema.pre<mongoose.Query<User, mongoose.Document<User>>>(/^find/, function (next) {
+  void this.find({ active: { $ne: false } });
+  next();
+});
 
 const UserModel = mongoose.model<User>('User', userSchema);
 

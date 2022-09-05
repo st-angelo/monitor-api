@@ -1,12 +1,14 @@
 import { Router } from 'express';
 import { protect } from '../controllers/authentication';
-import { spendings } from '../controllers/spending';
+import { addSpending, deleteSpending, getSpending, getSpendings, updateSpending } from '../controllers/spending';
 
 const router = Router();
 
 // Protect all routes that come after this middleware use
 router.use(protect);
 
-router.get('/', spendings);
+router.route('/').get(getSpendings).post(addSpending);
+
+router.route('/:id').get(getSpending).patch(updateSpending).delete(deleteSpending);
 
 export default router;

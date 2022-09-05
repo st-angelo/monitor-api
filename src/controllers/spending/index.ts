@@ -1,16 +1,14 @@
-import { catchAsync } from '../../utils/catchAsync';
-import { mockPromise } from '../../utils/functions';
-import { TypedRequest as Request } from '../common.js';
-import { SpendingsBody } from './metadata';
+import Spending from '../../data/entities/spending';
+import SpendingModel from '../../data/models/spendingModel';
+import factory from '../factory';
+import { AddSpendingBody } from './metadata';
 
-export const spendings = catchAsync(
-  async (req: Request<SpendingsBody>, res, next) => {
-    // TODO
-    await mockPromise();
+export const getSpendings = factory.getAll(SpendingModel);
 
-    res.status(200).json({
-      status: 'success',
-      data: ['ceva', 'altceva'],
-    });
-  }
-);
+export const getSpending = factory.getOne(SpendingModel);
+
+export const addSpending = factory.createOne<Spending, AddSpendingBody>(SpendingModel);
+
+export const updateSpending = factory.updateOne<Spending, AddSpendingBody>(SpendingModel);
+
+export const deleteSpending = factory.deleteOne(SpendingModel);
