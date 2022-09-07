@@ -1,17 +1,19 @@
-import { AutoMap } from '@automapper/classes';
-import { ObjectId } from 'mongoose';
+import { Category } from '@prisma/client';
 
 class CategoryDto {
-  id: ObjectId;
-
-  @AutoMap()
+  id: string;
   name: string;
+  description: string | null;
+  color: string;
+  userId: string | null;
 
-  @AutoMap()
-  description: string;
-
-  @AutoMap()
-  color?: string;
+  constructor(category: Category) {
+    this.id = category.id;
+    this.name = category.name;
+    this.description = category.description;
+    this.color = category.color;
+    this.userId = category.userId;
+  }
 }
 
 export default CategoryDto;

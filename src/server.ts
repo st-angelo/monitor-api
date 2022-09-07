@@ -3,16 +3,7 @@
 and establish some error handling */
 import './utils/config.js';
 import './startup.js';
-import mongoose from 'mongoose';
 import app from './app.js';
-import { __connectionString } from './utils/common.js';
-
-mongoose
-  .connect(__connectionString)
-  .then(_ => console.log('Database connection succesful!'))
-  .catch((err: Error) => {
-    throw new Error(`Database connection failed! Message: ${err.message}`);
-  });
 
 const port = process.env.PORT || 3000;
 const server = app.listen(port, () => {

@@ -1,22 +1,24 @@
-import { AutoMap } from '@automapper/classes';
-import { ObjectId } from 'mongoose';
-import { Currency } from '../constants';
-import Category from '../entities/category';
+import { Category, Spending } from '@prisma/client';
+import CategoryDto from './categoryDto';
 
 class SpendingDto {
-  id: ObjectId;
-
-  @AutoMap()
+  id: string;
   amount: number;
-
-  @AutoMap()
   date: Date;
+  currency: string;
+  category?: CategoryDto;
 
-  @AutoMap()
-  currency: Currency;
-
-  @AutoMap()
-  category: Category;
+  constructor(
+    spending: Spending & {
+      category?: Category;
+    }
+  ) {
+    this.id = spending.id;
+    this.amount = spending.amount;
+    this.date = spending.date;
+    this.currency = spending.currency;
+    this.category = spending.category && new CategoryDto(spending.category);
+  }
 }
 
 export default SpendingDto;

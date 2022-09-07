@@ -1,32 +1,73 @@
-import Category from '../../data/entities/category';
-import CategoryModel from '../../data/models/categoryModel';
-import SpendingModel from '../../data/models/spendingModel';
+import CategoryDto from '../../data/dto/categoryDto';
+import prisma from '../../data/prisma';
 import { AppError } from '../../utils/appError';
 import { catchAsync } from '../../utils/catchAsync';
-import factory from '../factory';
+import { TypedRequest as Request } from '../common';
 import { AddCategoryBody, UpdateCategoryBody } from './metadata';
 
-export const getCategories = factory.getAll(CategoryModel);
+export const getCategories = catchAsync(async (req: Request, res, next) => {
+  const categories = await prisma.category.findMany({ where: { OR: [{ userId: req.user.id }, { userId: null }] } });
 
-export const getCategory = factory.getOne(CategoryModel);
+  res.status(200).json({
+    success: true,
+    data: categories.map(category => new CategoryDto(category)),
+  });
+});
 
-export const addCategory = factory.createOne<Category, AddCategoryBody>(CategoryModel);
+export const getCategory = catchAsync(async (req, res, next) => {
+  const category = await prisma.category.findFirst({ where: { id: req.params.id } });
 
-export const updateCategory = factory.updateOne<Category, UpdateCategoryBody>(CategoryModel);
+  if (!category) return next(new AppError(`Could not find category with id ${req.params.id}`, 404));
+
+  res.status(200).json({
+    success: true,
+    data: new CategoryDto(category),
+  });
+});
+
+export const addCategory = catchAsync(async (req: Request<AddCategoryBody>, res, next) => {
+  const { name, description, color } = req.body;
+
+  const category = await prisma.category.create({
+    data: {
+      name,
+      description,
+      color,
+      userId: req.user.id,
+    },
+  });
+
+  res.status(200).json({
+    success: true,
+    data: new CategoryDto(category),
+  });
+});
+
+export const updateCategory = catchAsync(async (req: Request<UpdateCategoryBody>, res, next) => {
+  const { name, description, color } = req.body;
+
+  const category = await prisma.category.update({
+    data: {
+      name,
+      description,
+      color,
+    },
+    where: {
+      id: req.params.id,
+    },
+  });
+
+  res.status(200).json({
+    success: true,
+    data: new CategoryDto(category),
+  });
+});
 
 export const deleteCategory = catchAsync(async (req, res, next) => {
-  const { success, error } = await factory.executeTransaction(CategoryModel, async session => {
-    await SpendingModel.deleteMany({ categoryId: req.params.id }).session(session);
+  await prisma.$transaction([
+    prisma.spending.deleteMany({ where: { categoryId: req.params.id } }),
+    prisma.category.delete({ where: { id: req.params.id } }),
+  ]);
 
-    const deleted = await CategoryModel.findByIdAndDelete(req.params.id).session(session);
-
-    if (!deleted) throw new AppError(`No category found with the Id {${req.params.id}}`, 404);
-  });
-
-  if (!success) return next(new AppError(error || `Could not delete category with Id ${req.params.id}`, 404));
-
-  res.status(204).json({
-    status: 'success',
-    data: null,
-  });
+  res.status(204);
 });

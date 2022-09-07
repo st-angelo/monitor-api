@@ -1,5 +1,5 @@
 declare namespace Express {
   interface Request {
-    user?: import('../../src/data/entities/user').default;
+    user: import('@prisma/client').User;
   }
 }

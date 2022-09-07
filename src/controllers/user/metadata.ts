@@ -1,7 +1,7 @@
 export interface AddCategoryBody {
   name: string;
-  description: string;
-  color?: string;
+  description?: string;
+  color: string;
 }
 
 export interface UpdateCategoryBody {

@@ -1,20 +1,17 @@
-import { AutoMap } from '@automapper/classes';
-import { ObjectId } from 'mongoose';
+import { User } from '@prisma/client';
 
 class UserDto {
-  id: ObjectId;
-
-  @AutoMap()
-  firstName: string;
-
-  @AutoMap()
-  lastName: string;
-
-  @AutoMap()
+  id: string;
+  name: string;
   email: string;
+  photoUrl: string | null;
 
-  @AutoMap()
-  photo: string;
+  constructor(user: User) {
+    this.id = user.id;
+    this.name = user.name;
+    this.email = user.email;
+    this.photoUrl = user.photoUrl;
+  }
 }
 
 export default UserDto;

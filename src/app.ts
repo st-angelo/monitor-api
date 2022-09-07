@@ -1,7 +1,6 @@
 import cookieParser from 'cookie-parser';
 import cors from 'cors';
 import express from 'express';
-import mongoSanitize from 'express-mongo-sanitize';
 import rateLimit from 'express-rate-limit';
 import helmet from 'helmet';
 import hpp from 'hpp';
@@ -31,7 +30,7 @@ app.use(
 // Limit requests from the same API
 app.use(
   '/api',
-  rateLimit({
+  rateLimit({ 
     max: 100,
     windowMs: 60 * 60 * 1000,
     message: 'Too many requests from this IP, please try again in an hour!',
@@ -42,9 +41,6 @@ app.use(
 app.use(express.json({ limit: '10kb' }));
 
 app.use(cookieParser());
-
-// Data sanitization against NoSQL query injection
-app.use(mongoSanitize());
 
 // Data sanitization against XSS
 app.use(xss());

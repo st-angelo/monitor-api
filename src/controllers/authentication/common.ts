@@ -1,26 +1,23 @@
+import { User } from '@prisma/client';
 import bcrypt from 'bcryptjs';
-import crypto from 'crypto';
-import { add, format } from 'date-fns';
+import { format } from 'date-fns';
 import { NextFunction, Response } from 'express';
 import jwt from 'jsonwebtoken';
-import { ObjectId } from 'mongoose';
 import UserDto from '../../data/dto/userDto.js';
-import User from '../../data/entities/user.js';
 import { AppError } from '../../utils/appError.js';
-import mapper from '../../utils/mapper.js';
 
-export const signToken = (id: ObjectId): string =>
-  jwt.sign({ id }, process.env.JWT_SECRET, {
+export const signToken = ({ id, name, photoUrl }: User): string =>
+  jwt.sign({ id, name, photoUrl }, process.env.JWT_SECRET, {
     expiresIn: process.env.JWT_EXPIRES_IN,
   });
 
 export const createAndSendToken = (user: User, statusCode: number, res: Response) => {
-  const token = signToken(user._id);
+  const token = signToken(user);
   res.status(statusCode).json({
     status: 'success',
     token,
     data: {
-      user: mapper.map(user, User, UserDto),
+      user: new UserDto(user),
     },
   });
 };
@@ -31,16 +28,6 @@ export const userChangedPasswordAfter = (user: User, jwtTimestamp: number): bool
     return jwtTimestamp < changedTimestamp;
   }
   return false;
-};
-
-export const createPasswordResetToken = (user: User): string => {
-  const resetToken = crypto.randomBytes(32).toString('hex');
-
-  user.passwordResetToken = crypto.createHash('sha256').update(resetToken).digest('hex');
-
-  user.passwordResetExpires = add(Date.now(), { minutes: 10 });
-
-  return resetToken;
 };
 
 export const correctPassword = (value: string, currentPassword: string): Promise<boolean> => bcrypt.compare(value, currentPassword);
