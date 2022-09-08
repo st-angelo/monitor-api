@@ -4,6 +4,7 @@ import express from 'express';
 import rateLimit from 'express-rate-limit';
 import helmet from 'helmet';
 import hpp from 'hpp';
+import morgan from 'morgan';
 import xss from 'xss-clean';
 import globalErrorHandler from './controllers/error';
 import authenticationRouter from './routers/authenticationRouter.js';
@@ -25,12 +26,12 @@ app.use(
 );
 
 // Logging
-//app.use(morgan('combined'));
+app.use(morgan('combined'));
 
 // Limit requests from the same API
 app.use(
   '/api',
-  rateLimit({ 
+  rateLimit({
     max: 100,
     windowMs: 60 * 60 * 1000,
     message: 'Too many requests from this IP, please try again in an hour!',
@@ -50,11 +51,6 @@ app.use(hpp());
 
 // Serving static files
 app.use(express.static(`${__dirname}/public`));
-
-// Test
-app.use((req, res, next) => {
-  next();
-});
 
 app.use('/api/v1', authenticationRouter);
 app.use('/api/v1/user', userRouter);
