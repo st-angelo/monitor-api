@@ -6,7 +6,7 @@ import { TypedRequest as Request } from '../common';
 import { AddCategoryBody, UpdateCategoryBody } from './metadata';
 
 export const getCategories = catchAsync(async (req: Request, res, next) => {
-  const categories = await prisma.category.findMany({ where: { OR: [{ userId: req.user.id }, { userId: null }] } });
+  const categories = await prisma.category.findMany({ where: { userId: req.user.id } });
 
   res.status(200).json({
     success: true,
