@@ -7,6 +7,7 @@ class SpendingDto {
   date: Date;
   currency: string;
   category?: CategoryDto;
+  userId: string;
 
   constructor(
     spending: Spending & {
@@ -18,6 +19,7 @@ class SpendingDto {
     this.date = spending.date;
     this.currency = spending.currency;
     this.category = spending.category && new CategoryDto(spending.category);
+    this.userId = spending.userId;
   }
 }
 
