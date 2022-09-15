@@ -3,10 +3,12 @@ import prisma from '../../data/prisma';
 import { AppError } from '../../utils/appError';
 import { catchAsync } from '../../utils/catchAsync';
 import { TypedRequest as Request } from '../common';
+import { getPrismaTransactionFilters } from './common';
 import { AddTransactionBody, UpdateTransactionBody } from './metadata';
 
-export const getTransactions = catchAsync(async (req: Request, res, next) => {
-  const transactions = await prisma.transaction.findMany({ where: { userId: req.user.id } });
+export const getTransactions = catchAsync(async (req: Request<any, Record<string, string | undefined>>, res, next) => {
+  const filters = getPrismaTransactionFilters(req.query);
+  const transactions = await prisma.transaction.findMany({ where: { userId: req.user.id, ...filters } });
 
   res.status(200).json({
     success: true,
@@ -36,7 +38,7 @@ export const addTransaction = catchAsync(async (req: Request<AddTransactionBody>
       currency,
       categoryId,
       userId: req.user.id,
-      isRecurrent
+      isRecurrent,
     },
     include: {
       category: true,
