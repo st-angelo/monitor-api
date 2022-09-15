@@ -65,7 +65,7 @@ export const updateCategory = catchAsync(async (req: Request<UpdateCategoryBody>
 
 export const deleteCategory = catchAsync(async (req, res, next) => {
   await prisma.$transaction([
-    prisma.spending.deleteMany({ where: { categoryId: req.params.id } }),
+    prisma.transaction.deleteMany({ where: { categoryId: req.params.id } }),
     prisma.category.delete({ where: { id: req.params.id } }),
   ]);
 

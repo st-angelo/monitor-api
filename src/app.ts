@@ -9,7 +9,7 @@ import xss from 'xss-clean';
 import globalErrorHandler from './controllers/error';
 import authenticationRouter from './routers/authenticationRouter.js';
 import dictionaryRouter from './routers/dictionaryRouter';
-import spendingRouter from './routers/spendingRouter.js';
+import transactionRouter from './routers/transactionRouter.js';
 import userRouter from './routers/userRouter.js';
 import { AppError } from './utils/appError.js';
 import { __dirname } from './utils/common.js';
@@ -55,7 +55,7 @@ app.use(express.static(`${__dirname}/public`));
 
 app.use('/api/v1', authenticationRouter);
 app.use('/api/v1/user', userRouter);
-app.use('/api/v1/spending', spendingRouter);
+app.use('/api/v1/transaction', transactionRouter);
 app.use('/api/v1/dictionary', dictionaryRouter);
 
 app.all('*', (req, _, next) => {

@@ -41,7 +41,6 @@ module.exports = {
         props: false,
       },
     ],
-    'no-console': 'warn',
     'import/prefer-default-export': 0,
     import: 0,
     'func-names': 0,

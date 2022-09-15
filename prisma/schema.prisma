@@ -24,7 +24,7 @@ model User {
   passwordResetExpires DateTime?
   UserPreference       UserPreference?
   Category             Category[]
-  Spending             Spending[]
+  Transaction          Transaction[]
 
   @@index([email])
 }
@@ -45,25 +45,27 @@ model Currency {
   @@index([code])
 }
 
-model Spending {
-  id         String   @id() @default(uuid())
-  amount     Int
-  date       DateTime
-  currency   String
-  categoryId String
-  category   Category @relation(fields: [categoryId], references: [id])
-  userId     String
-  user       User     @relation(fields: [userId], references: [id])
+model Transaction {
+  id          String          @id() @default(uuid())
+  type        TransactionType
+  amount      Int
+  date        DateTime
+  currency    String
+  categoryId  String
+  category    Category        @relation(fields: [categoryId], references: [id])
+  userId      String
+  user        User            @relation(fields: [userId], references: [id])
+  isRecurrent Boolean         @default(false)
 }
 
 model Category {
-  id          String     @id() @default(uuid())
+  id          String        @id() @default(uuid())
   name        String
   description String?
   color       String
   userId      String?
-  user        User?      @relation(fields: [userId], references: [id])
-  Spending    Spending[]
+  user        User?         @relation(fields: [userId], references: [id])
+  Transaction Transaction[]
 
   @@unique([userId, name])
 }
@@ -71,4 +73,9 @@ model Category {
 // Enums
 enum UserRole {
   User
+}
+
+enum TransactionType {
+  Spending
+  Earning
 }
