@@ -1,6 +1,6 @@
 import { Router } from 'express';
-import { protect, updatePassword } from '../controllers/authentication';
-import { addCategory, deleteCategory, getCategories, getCategory, updateCategory } from '../controllers/user';
+import { protect } from '../controllers/authentication';
+import { addCategory, deleteCategory, getCategories, getCategory, updateCategory, updatePassword } from '../controllers/user';
 
 const router = Router();
 

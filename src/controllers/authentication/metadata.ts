@@ -16,8 +16,3 @@ export interface ForgotPasswordBody {
 export interface ResetPasswordBody {
   password: string;
 }
-
-export interface UpdatePasswordBody {
-  currentPassword: string;
-  newPassword: string;
-}

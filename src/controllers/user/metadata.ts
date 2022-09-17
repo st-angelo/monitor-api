@@ -1,3 +1,8 @@
+export interface UpdatePasswordBody {
+  currentPassword: string;
+  newPassword: string;
+}
+
 export interface AddCategoryBody {
   name: string;
   description?: string;

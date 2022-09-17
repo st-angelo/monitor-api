@@ -3,12 +3,12 @@ import prisma from '../../data/prisma';
 import { AppError } from '../../utils/appError';
 import { catchAsync } from '../../utils/catchAsync';
 import { TypedRequest as Request } from '../common';
-import { getPrismaTransactionFilters } from './common';
+import { getTransactionOptions } from './common';
 import { AddTransactionBody, UpdateTransactionBody } from './metadata';
 
-export const getTransactions = catchAsync(async (req: Request<any, Record<string, string | undefined>>, res, next) => {
-  const filters = getPrismaTransactionFilters(req.query);
-  const transactions = await prisma.transaction.findMany({ where: { userId: req.user.id, ...filters } });
+export const getTransactions = catchAsync(async (req: Request<any, Record<string, string>>, res, next) => {
+  const { filters, orderBy, skip, take } = getTransactionOptions(req.query);
+  const transactions = await prisma.transaction.findMany({ where: { userId: req.user.id, ...filters }, orderBy, skip, take });
 
   res.status(200).json({
     success: true,

@@ -9,7 +9,7 @@ import { catchAsync } from '../../utils/catchAsync.js';
 import { verifyJWT } from '../../utils/jwtHelpers.js';
 import { TypedRequest as Request } from '../common.js';
 import { correctPassword, createAndSendToken, userChangedPasswordAfter, userNotFound } from './common.js';
-import { ForgotPasswordBody, LoginBody, ResetPasswordBody, SignupBody, UpdatePasswordBody } from './metadata.js';
+import { ForgotPasswordBody, LoginBody, ResetPasswordBody, SignupBody } from './metadata.js';
 
 export const signup = catchAsync(async (req: Request<SignupBody>, res, next) => {
   const { name, email, password } = req.body;
@@ -146,28 +146,5 @@ export const resetPassword = catchAsync(async (req: Request<ResetPasswordBody>, 
   });
 
   // 4. Log the user in, send JWT
-  createAndSendToken(user, 200, res);
-});
-
-export const updatePassword = catchAsync(async (req: Request<UpdatePasswordBody>, res, next) => {
-  // 1. Get user from collection
-  const user = await prisma.user.findFirst({ where: { id: req.user.id } });
-  if (!user) return next(new AppError('User could not be found', 401));
-
-  // 2. Check if POSTed password is correct
-  if (!(await correctPassword(req.body.currentPassword, user.password))) return next(new AppError('Your current password is wrong', 401));
-
-  // 3. If so, update password
-  await prisma.user.update({
-    data: {
-      password: await bcrypt.hash(req.body.newPassword, 12),
-      passwordChangedAt: new Date(),
-    },
-    where: {
-      id: user.id,
-    },
-  });
-
-  // 4. Log in user, send JWT
   createAndSendToken(user, 200, res);
 });

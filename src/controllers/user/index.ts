@@ -1,12 +1,41 @@
+import bcrypt from 'bcryptjs';
 import CategoryDto from '../../data/dto/categoryDto';
 import prisma from '../../data/prisma';
 import { AppError } from '../../utils/appError';
 import { catchAsync } from '../../utils/catchAsync';
+import { correctPassword, createAndSendToken } from '../authentication/common';
 import { TypedRequest as Request } from '../common';
-import { AddCategoryBody, UpdateCategoryBody } from './metadata';
+import { getCategoryFilterOptions } from './common';
+import { AddCategoryBody, UpdateCategoryBody, UpdatePasswordBody } from './metadata';
+
+export const updatePassword = catchAsync(async (req: Request<UpdatePasswordBody>, res, next) => {
+  // 1. Get user from collection
+  const user = await prisma.user.findFirst({ where: { id: req.user.id } });
+  if (!user) return next(new AppError('User could not be found', 401));
+
+  // 2. Check if POSTed password is correct
+  if (!(await correctPassword(req.body.currentPassword, user.password))) return next(new AppError('Your current password is wrong', 401));
+
+  // 3. If so, update password
+  await prisma.user.update({
+    data: {
+      password: await bcrypt.hash(req.body.newPassword, 12),
+      passwordChangedAt: new Date(),
+    },
+    where: {
+      id: user.id,
+    },
+  });
+
+  // 4. Log in user, send JWT
+  createAndSendToken(user, 200, res);
+});
+
+// #region Category
 
 export const getCategories = catchAsync(async (req: Request, res, next) => {
-  const categories = await prisma.category.findMany({ where: { userId: req.user.id } });
+  const filters = getCategoryFilterOptions(req.params);
+  const categories = await prisma.category.findMany({ where: { userId: req.user.id, ...filters } });
 
   res.status(200).json({
     success: true,
@@ -71,3 +100,5 @@ export const deleteCategory = catchAsync(async (req, res, next) => {
 
   res.status(204);
 });
+
+// #endregion
