@@ -37,10 +37,7 @@ export const getCategories = catchAsync(async (req: Request, res, next) => {
   const filters = getCategoryFilterOptions(req.params);
   const categories = await prisma.category.findMany({ where: { userId: req.user.id, ...filters } });
 
-  res.status(200).json({
-    success: true,
-    data: categories.map(category => new CategoryDto(category)),
-  });
+  res.status(200).json(categories.map(category => new CategoryDto(category)));
 });
 
 export const getCategory = catchAsync(async (req, res, next) => {
@@ -48,10 +45,7 @@ export const getCategory = catchAsync(async (req, res, next) => {
 
   if (!category) return next(new AppError(`Could not find category with id ${req.params.id}`, 404));
 
-  res.status(200).json({
-    success: true,
-    data: new CategoryDto(category),
-  });
+  res.status(200).json(new CategoryDto(category));
 });
 
 export const addCategory = catchAsync(async (req: Request<AddCategoryBody>, res, next) => {
@@ -66,10 +60,7 @@ export const addCategory = catchAsync(async (req: Request<AddCategoryBody>, res,
     },
   });
 
-  res.status(200).json({
-    success: true,
-    data: new CategoryDto(category),
-  });
+  res.status(200).json(new CategoryDto(category));
 });
 
 export const updateCategory = catchAsync(async (req: Request<UpdateCategoryBody>, res, next) => {
@@ -86,10 +77,7 @@ export const updateCategory = catchAsync(async (req: Request<UpdateCategoryBody>
     },
   });
 
-  res.status(200).json({
-    success: true,
-    data: new CategoryDto(category),
-  });
+  res.status(200).json(new CategoryDto(category));
 });
 
 export const deleteCategory = catchAsync(async (req, res, next) => {

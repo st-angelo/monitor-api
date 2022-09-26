@@ -14,11 +14,8 @@ export const signToken = ({ id, name, photoUrl }: User): string =>
 export const createAndSendToken = (user: User, statusCode: number, res: Response) => {
   const token = signToken(user);
   res.status(statusCode).json({
-    status: 'success',
     token,
-    data: {
-      user: new UserDto(user),
-    },
+    user: new UserDto(user),
   });
 };
 

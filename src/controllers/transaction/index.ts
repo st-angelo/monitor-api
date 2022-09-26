@@ -10,10 +10,7 @@ export const getTransactions = catchAsync(async (req: Request<any, Record<string
   const { filters, orderBy, skip, take } = getTransactionOptions(req.query);
   const transactions = await prisma.transaction.findMany({ where: { userId: req.user.id, ...filters }, orderBy, skip, take });
 
-  res.status(200).json({
-    success: true,
-    data: transactions.map(transaction => new TransactionDto(transaction)),
-  });
+  res.status(200).json(transactions.map(transaction => new TransactionDto(transaction)));
 });
 
 export const getTransaction = catchAsync(async (req: Request, res, next) => {
@@ -21,10 +18,7 @@ export const getTransaction = catchAsync(async (req: Request, res, next) => {
 
   if (!transaction) return next(new AppError(`Could not find transaction with id ${req.params.id}`, 404));
 
-  res.status(200).json({
-    success: true,
-    data: new TransactionDto(transaction),
-  });
+  res.status(200).json(new TransactionDto(transaction));
 });
 
 export const addTransaction = catchAsync(async (req: Request<AddTransactionBody>, res, next) => {
@@ -45,10 +39,7 @@ export const addTransaction = catchAsync(async (req: Request<AddTransactionBody>
     },
   });
 
-  res.status(200).json({
-    success: true,
-    data: new TransactionDto(transaction),
-  });
+  res.status(200).json(new TransactionDto(transaction));
 });
 
 export const updateTransaction = catchAsync(async (req: Request<UpdateTransactionBody>, res, next) => {
@@ -70,10 +61,7 @@ export const updateTransaction = catchAsync(async (req: Request<UpdateTransactio
     },
   });
 
-  res.status(200).json({
-    success: true,
-    data: new TransactionDto(transaction),
-  });
+  res.status(200).json(new TransactionDto(transaction));
 });
 
 export const deleteTransaction = catchAsync(async (req: Request, res, next) => {
