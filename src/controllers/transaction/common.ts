@@ -1,3 +1,5 @@
+import { getPaginationOptions, getSortingOptions } from '../common';
+
 export const getTransactionFilterOptions = (query: Record<string, string>) => {
   const { type, currency, categoryId, isRecurrent, startDate, endDate } = query;
   const options: Record<string, unknown> = {};
@@ -12,30 +14,10 @@ export const getTransactionFilterOptions = (query: Record<string, string>) => {
   return options;
 };
 
-export const getTransactionSortingOptions = (query: Record<string, string>) => {
-  const { $orderBy, $direction } = query;
-  const options: Record<string, string>[] = [];
-
-  if ($orderBy) options.push({ [$orderBy]: $direction || 'asc' });
-
-  return options;
-};
-
-export const getTransactionPaginationOptions = (query: Record<string, string>) => {
-  const { $page, $size } = query;
-
-  const options = {
-    skip: (Number($page) - 1) * Number($size) || 0,
-    take: Number($size) || 10,
-  };
-
-  return options;
-};
-
 export const getTransactionOptions = (query: Record<string, string>) => {
   const filters = getTransactionFilterOptions(query);
-  const orderBy = getTransactionSortingOptions(query);
-  const { skip, take } = getTransactionPaginationOptions(query);
+  const orderBy = getSortingOptions(query);
+  const { skip, take } = getPaginationOptions(query);
 
   return { filters, orderBy, skip, take };
 };

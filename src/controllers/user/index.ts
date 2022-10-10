@@ -5,7 +5,7 @@ import { AppError } from '../../utils/appError';
 import { catchAsync } from '../../utils/catchAsync';
 import { correctPassword, createAndSendToken } from '../authentication/common';
 import { TypedRequest as Request } from '../common';
-import { getCategoryFilterOptions } from './common';
+import { getCategoryOptions } from './common';
 import { AddCategoryBody, UpdateCategoryBody, UpdatePasswordBody } from './metadata';
 
 export const updatePassword = catchAsync(async (req: Request<UpdatePasswordBody>, res, next) => {
@@ -33,11 +33,18 @@ export const updatePassword = catchAsync(async (req: Request<UpdatePasswordBody>
 
 // #region Category
 
-export const getCategories = catchAsync(async (req: Request, res, next) => {
-  const filters = getCategoryFilterOptions(req.params);
-  const categories = await prisma.category.findMany({ where: { userId: req.user.id, ...filters } });
+export const getCategories = catchAsync(async (req: Request<any, Record<string, string>>, res, next) => {
+  const { filters, orderBy, skip, take } = getCategoryOptions(req.query);
+  console.log(filters, orderBy, skip, take);
+  const [total, categories] = await prisma.$transaction([
+    prisma.category.count({ where: { userId: req.user.id, ...filters } }),
+    prisma.category.findMany({ where: { userId: req.user.id, ...filters }, orderBy, skip, take }),
+  ]);
 
-  res.status(200).json(categories.map(category => new CategoryDto(category)));
+  res.status(200).json({
+    total,
+    values: categories.map(category => new CategoryDto(category)),
+  });
 });
 
 export const getCategory = catchAsync(async (req, res, next) => {
