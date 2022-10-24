@@ -7,6 +7,7 @@ export interface AddCategoryBody {
   name: string;
   description?: string;
   color: string;
+  transactionTypeId: string;
 }
 
 export interface UpdateCategoryBody {

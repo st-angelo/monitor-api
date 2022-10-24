@@ -1,7 +1,5 @@
-import { TransactionType } from '@prisma/client';
-
 export interface AddTransactionBody {
-  type: TransactionType;
+  typeId: string;
   amount: number;
   date: Date;
   currency: string;

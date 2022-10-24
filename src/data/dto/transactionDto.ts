@@ -3,26 +3,25 @@ import CategoryDto from './categoryDto';
 
 class TransactionDto {
   id: string;
-  type: TransactionType;
+  typeId: string;
   amount: number;
   date: Date;
   currency: string;
   category?: CategoryDto;
-  userId: string;
   isRecurrent?: boolean;
 
   constructor(
     transaction: Transaction & {
-      category?: Category;
+      type: TransactionType;
+      category: Category;
     }
   ) {
     this.id = transaction.id;
-    this.type = transaction.type;
+    this.typeId = transaction.type.id;
     this.amount = transaction.amount;
     this.date = transaction.date;
     this.currency = transaction.currency;
     this.category = transaction.category && new CategoryDto(transaction.category);
-    this.userId = transaction.userId;
     this.isRecurrent = transaction.isRecurrent;
   }
 }

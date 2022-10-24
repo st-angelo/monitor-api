@@ -13,7 +13,7 @@ datasource db {
 }
 
 model User {
-  id                   String          @id() @default(uuid())
+  id                   String          @id @default(uuid())
   name                 String
   email                String          @unique
   role                 UserRole        @default(User)
@@ -30,24 +30,24 @@ model User {
 }
 
 model UserPreference {
-  id               String @id() @default(uuid())
+  id               String @id @default(uuid())
   baseCurrencyCode String
   userId           String @unique
   user             User   @relation(fields: [userId], references: [id])
 }
 
 model Currency {
-  id     Int     @id() @default(autoincrement())
+  id     String  @id @default(uuid())
   code   String  @unique
-  name   String
   active Boolean @default(true)
 
   @@index([code])
 }
 
 model Transaction {
-  id          String          @id() @default(uuid())
-  type        TransactionType
+  id          String          @id @default(uuid())
+  typeId      String
+  type        TransactionType @relation(fields: [typeId], references: [id])
   amount      Int
   date        DateTime
   currency    String
@@ -59,23 +59,29 @@ model Transaction {
 }
 
 model Category {
-  id          String        @id() @default(uuid())
-  name        String
-  description String?
-  color       String
-  userId      String?
-  user        User?         @relation(fields: [userId], references: [id])
-  Transaction Transaction[]
+  id                String          @id @default(uuid())
+  code              String
+  name              String?
+  description       String?
+  color             String
+  transactionTypeId String
+  transactionType   TransactionType @relation(fields: [transactionTypeId], references: [id])
+  userId            String?
+  user              User?           @relation(fields: [userId], references: [id])
+  Transaction       Transaction[]
 
   @@unique([userId, name])
+}
+
+model TransactionType {
+  id          String        @id @default(uuid())
+  code        String        @unique
+  active      Boolean       @default(true)
+  Transaction Transaction[]
+  Category    Category[]
 }
 
 // Enums
 enum UserRole {
   User
-}
-
-enum TransactionType {
-  Spending
-  Earning
 }

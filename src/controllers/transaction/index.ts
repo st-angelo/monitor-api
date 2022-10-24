@@ -8,13 +8,26 @@ import { AddTransactionBody, UpdateTransactionBody } from './metadata';
 
 export const getTransactions = catchAsync(async (req: Request<any, Record<string, string>>, res, next) => {
   const { filters, orderBy, skip, take } = getTransactionOptions(req.query);
-  const transactions = await prisma.transaction.findMany({ where: { userId: req.user.id, ...filters }, orderBy, skip, take });
 
-  res.status(200).json(transactions.map(transaction => new TransactionDto(transaction)));
+  const [total, transactions] = await prisma.$transaction([
+    prisma.transaction.count({ where: { userId: req.user.id, ...filters } }),
+    prisma.transaction.findMany({
+      include: { category: true, type: true },
+      where: { userId: req.user.id, ...filters },
+      orderBy,
+      skip,
+      take,
+    }),
+  ]);
+
+  res.status(200).json({
+    total,
+    values: transactions.map(transaction => new TransactionDto(transaction)),
+  });
 });
 
 export const getTransaction = catchAsync(async (req: Request, res, next) => {
-  const transaction = await prisma.transaction.findFirst({ where: { id: req.params.id }, include: { category: true } });
+  const transaction = await prisma.transaction.findFirst({ where: { id: req.params.id }, include: { category: true, type: true } });
 
   if (!transaction) return next(new AppError(`Could not find transaction with id ${req.params.id}`, 404));
 
@@ -22,11 +35,11 @@ export const getTransaction = catchAsync(async (req: Request, res, next) => {
 });
 
 export const addTransaction = catchAsync(async (req: Request<AddTransactionBody>, res, next) => {
-  const { type, amount, date, currency, categoryId, isRecurrent } = req.body;
-
+  const { typeId, amount, date, currency, categoryId, isRecurrent } = req.body;
+  
   const transaction = await prisma.transaction.create({
     data: {
-      type,
+      typeId,
       amount,
       date: new Date(date),
       currency,
@@ -36,6 +49,7 @@ export const addTransaction = catchAsync(async (req: Request<AddTransactionBody>
     },
     include: {
       category: true,
+      type: true,
     },
   });
 
@@ -58,6 +72,7 @@ export const updateTransaction = catchAsync(async (req: Request<UpdateTransactio
     },
     include: {
       category: true,
+      type: true,
     },
   });
 

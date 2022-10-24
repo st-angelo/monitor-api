@@ -1,15 +1,17 @@
 import { getPaginationOptions, getSortingOptions } from '../common';
 
 export const getTransactionFilterOptions = (query: Record<string, string>) => {
-  const { type, currency, categoryId, isRecurrent, startDate, endDate } = query;
+  const { type, dateFrom, dateTo, category, currency, amountFrom, amountTo, isRecurrent } = query;
   const options: Record<string, unknown> = {};
-
+  console.log(query);
   if (type) options.type = type;
+  if (dateFrom) options.AND = [{ date: { gte: new Date(dateFrom) } }];
+  if (dateTo) options.AND = [...((options.AND as unknown[]) || []), { date: { lte: new Date(dateTo) } }];
   if (currency) options.currency = currency;
-  if (categoryId) options.categoryId = categoryId;
+  if (category) options.categoryId = category;
+  if (amountFrom) options.AND = [...((options.AND as unknown[]) || []), { amount: { gte: parseFloat(amountFrom) } }];
+  if (amountTo) options.AND = [...((options.AND as unknown[]) || []), { amount: { lte: parseFloat(amountTo) } }];
   if (isRecurrent) options.isRecurrent = JSON.parse(isRecurrent);
-  if (startDate) options.AND = [{ date: { gte: new Date(startDate) } }];
-  if (endDate) options.AND = [...((options.AND as unknown[]) || []), { date: { lte: new Date(endDate) } }];
 
   return options;
 };

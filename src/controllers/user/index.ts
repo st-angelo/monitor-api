@@ -35,7 +35,6 @@ export const updatePassword = catchAsync(async (req: Request<UpdatePasswordBody>
 
 export const getCategories = catchAsync(async (req: Request<any, Record<string, string>>, res, next) => {
   const { filters, orderBy, skip, take } = getCategoryOptions(req.query);
-  console.log(filters, orderBy, skip, take);
   const [total, categories] = await prisma.$transaction([
     prisma.category.count({ where: { userId: req.user.id, ...filters } }),
     prisma.category.findMany({ where: { userId: req.user.id, ...filters }, orderBy, skip, take }),
@@ -56,13 +55,14 @@ export const getCategory = catchAsync(async (req, res, next) => {
 });
 
 export const addCategory = catchAsync(async (req: Request<AddCategoryBody>, res, next) => {
-  const { name, description, color } = req.body;
+  const { name, description, color, transactionTypeId } = req.body;
 
   const category = await prisma.category.create({
     data: {
       name,
       description,
       color,
+      transactionTypeId,
       userId: req.user.id,
     },
   });
