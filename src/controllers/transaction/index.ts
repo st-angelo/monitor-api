@@ -12,7 +12,7 @@ export const getTransactions = catchAsync(async (req: Request<any, Record<string
   const [total, transactions] = await prisma.$transaction([
     prisma.transaction.count({ where: { userId: req.user.id, ...filters } }),
     prisma.transaction.findMany({
-      include: { category: true, type: true },
+      include: { type: true, currency: true, category: true },
       where: { userId: req.user.id, ...filters },
       orderBy,
       skip,
@@ -27,7 +27,10 @@ export const getTransactions = catchAsync(async (req: Request<any, Record<string
 });
 
 export const getTransaction = catchAsync(async (req: Request, res, next) => {
-  const transaction = await prisma.transaction.findFirst({ where: { id: req.params.id }, include: { category: true, type: true } });
+  const transaction = await prisma.transaction.findFirst({
+    where: { id: req.params.id },
+    include: { type: true, currency: true, category: true },
+  });
 
   if (!transaction) return next(new AppError(`Could not find transaction with id ${req.params.id}`, 404));
 
@@ -35,21 +38,22 @@ export const getTransaction = catchAsync(async (req: Request, res, next) => {
 });
 
 export const addTransaction = catchAsync(async (req: Request<AddTransactionBody>, res, next) => {
-  const { typeId, amount, date, currency, categoryId, isRecurrent } = req.body;
-  
+  const { typeId, amount, date, currencyId, categoryId, isRecurrent } = req.body;
+
   const transaction = await prisma.transaction.create({
     data: {
       typeId,
       amount,
       date: new Date(date),
-      currency,
+      currencyId,
       categoryId,
       userId: req.user.id,
       isRecurrent,
     },
     include: {
-      category: true,
       type: true,
+      currency: true,
+      category: true,
     },
   });
 
@@ -57,13 +61,13 @@ export const addTransaction = catchAsync(async (req: Request<AddTransactionBody>
 });
 
 export const updateTransaction = catchAsync(async (req: Request<UpdateTransactionBody>, res, next) => {
-  const { amount, date, currency, categoryId } = req.body;
+  const { amount, date, currencyId, categoryId } = req.body;
 
   const transaction = await prisma.transaction.update({
     data: {
       amount,
       date,
-      currency,
+      currencyId,
       categoryId,
       userId: req.user.id,
     },
@@ -71,8 +75,9 @@ export const updateTransaction = catchAsync(async (req: Request<UpdateTransactio
       id: req.params.id,
     },
     include: {
-      category: true,
       type: true,
+      currency: true,
+      category: true,
     },
   });
 

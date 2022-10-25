@@ -1,6 +1,14 @@
 import { Router } from 'express';
 import { protect } from '../controllers/authentication';
-import { addCategory, deleteCategory, getCategories, getCategory, updateCategory, updatePassword } from '../controllers/user';
+import {
+  addCategory,
+  deleteCategory,
+  getCategories,
+  getCategory,
+  getMiscellaneousInfo,
+  updateCategory,
+  updatePassword,
+} from '../controllers/user';
 
 const router = Router();
 
@@ -8,6 +16,8 @@ const router = Router();
 router.use(protect);
 
 router.patch('/updatePassword', updatePassword);
+
+router.get('/miscellaneous-info', getMiscellaneousInfo);
 
 // Categories
 router.route('/category').get(getCategories).post(addCategory);

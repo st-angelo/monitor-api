@@ -12,14 +12,15 @@ import { correctPassword, createAndSendToken, userChangedPasswordAfter, userNotF
 import { ForgotPasswordBody, LoginBody, ResetPasswordBody, SignupBody } from './metadata.js';
 
 export const signup = catchAsync(async (req: Request<SignupBody>, res, next) => {
-  const { name, email, password } = req.body;
+  const { firstName, lastName, email, password } = req.body;
 
   const existing = await prisma.user.count({ where: { email } });
   if (existing > 0) return next(new AppError('A user with this email already exists', 409));
 
   const newUser = await prisma.user.create({
     data: {
-      name,
+      firstName,
+      lastName,
       email,
       password: await bcrypt.hash(password, 12),
     },

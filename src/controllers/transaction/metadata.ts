@@ -1,8 +1,8 @@
-export interface AddTransactionBody {
+export interface  AddTransactionBody {
   typeId: string;
   amount: number;
   date: Date;
-  currency: string;
+  currencyId: string;
   categoryId: string;
   isRecurrent?: boolean;
 }
@@ -10,7 +10,7 @@ export interface AddTransactionBody {
 export interface UpdateTransactionBody {
   amount: number;
   date: Date;
-  currency: string;
+  currencyId: string;
   categoryId: string;
   isRecurrent?: boolean;
 }

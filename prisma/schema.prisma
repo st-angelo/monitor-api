@@ -14,7 +14,8 @@ datasource db {
 
 model User {
   id                   String          @id @default(uuid())
-  name                 String
+  firstName            String
+  lastName             String
   email                String          @unique
   role                 UserRole        @default(User)
   photoUrl             String?
@@ -30,16 +31,18 @@ model User {
 }
 
 model UserPreference {
-  id               String @id @default(uuid())
-  baseCurrencyCode String
-  userId           String @unique
-  user             User   @relation(fields: [userId], references: [id])
+  id             String @id @default(uuid())
+  baseCurrencyId String
+  userId         String @unique
+  user           User   @relation(fields: [userId], references: [id])
 }
 
 model Currency {
-  id     String  @id @default(uuid())
-  code   String  @unique
-  active Boolean @default(true)
+  id          String        @id @default(uuid())
+  code        String        @unique
+  implicit    Boolean       @default(false)
+  active      Boolean       @default(true)
+  Transaction Transaction[]
 
   @@index([code])
 }
@@ -50,7 +53,9 @@ model Transaction {
   type        TransactionType @relation(fields: [typeId], references: [id])
   amount      Int
   date        DateTime
-  currency    String
+  added       DateTime        @default(now())
+  currencyId  String
+  currency    Currency        @relation(fields: [currencyId], references: [id])
   categoryId  String
   category    Category        @relation(fields: [categoryId], references: [id])
   userId      String
@@ -60,7 +65,7 @@ model Transaction {
 
 model Category {
   id                String          @id @default(uuid())
-  code              String
+  code              String?
   name              String?
   description       String?
   color             String
@@ -70,12 +75,13 @@ model Category {
   user              User?           @relation(fields: [userId], references: [id])
   Transaction       Transaction[]
 
-  @@unique([userId, name])
+  @@unique([userId, name, transactionTypeId])
 }
 
 model TransactionType {
   id          String        @id @default(uuid())
   code        String        @unique
+  implicit    Boolean       @default(false)
   active      Boolean       @default(true)
   Transaction Transaction[]
   Category    Category[]

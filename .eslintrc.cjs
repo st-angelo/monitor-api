@@ -7,14 +7,17 @@ module.exports = {
   },
   parser: '@typescript-eslint/parser',
   plugins: ['@typescript-eslint', 'prettier'],
-  extends: [
-    'eslint:recommended',
-    'plugin:@typescript-eslint/eslint-recommended',
-    'plugin:@typescript-eslint/recommended-requiring-type-checking',
-    'prettier',
-  ],
-  parserOptions: {
-    project: ['./tsconfig.json'],
+  overrides: {
+    files: ['*.ts'],
+    extends: [
+      'eslint:recommended',
+      'plugin:@typescript-eslint/eslint-recommended',
+      'plugin:@typescript-eslint/recommended-requiring-type-checking',
+      'prettier',
+    ],
+    parserOptions: {
+      project: ['./tsconfig.json'],
+    },
   },
   rules: {
     'no-debugger': 0,

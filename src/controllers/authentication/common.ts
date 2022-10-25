@@ -6,8 +6,8 @@ import jwt from 'jsonwebtoken';
 import UserDto from '../../data/dto/userDto.js';
 import { AppError } from '../../utils/appError.js';
 
-export const signToken = ({ id, name, photoUrl }: User): string =>
-  jwt.sign({ id, name, photoUrl }, process.env.JWT_SECRET, {
+export const signToken = ({ id, firstName, lastName, photoUrl }: User): string =>
+  jwt.sign({ id, firstName, lastName, photoUrl }, process.env.JWT_SECRET, {
     expiresIn: process.env.JWT_EXPIRES_IN,
   });
 

@@ -31,6 +31,25 @@ export const updatePassword = catchAsync(async (req: Request<UpdatePasswordBody>
   createAndSendToken(user, 200, res);
 });
 
+export const getMiscellaneousInfo = catchAsync(async (req, res, next) => {
+  const [lastTransaction, implicitTransactionType, implicitCurrency] = await prisma.$transaction([
+    prisma.transaction.findFirst({
+      where: { userId: req.user.id },
+      select: { currencyId: true, typeId: true },
+      orderBy: { added: 'desc' },
+    }),
+    prisma.transactionType.findFirst({ where: { implicit: true }, select: { id: true } }),
+    prisma.currency.findFirst({ where: { implicit: true }, select: { id: true } }),
+  ]);
+
+  res.status(200).json({
+    lastTransactionTypeId: lastTransaction?.typeId,
+    implicitTransactionTypeId: implicitTransactionType?.id,
+    lastCurrencyId: lastTransaction?.currencyId,
+    implicitCurrencyId: implicitCurrency?.id,
+  });
+});
+
 // #region Category
 
 export const getCategories = catchAsync(async (req: Request<any, Record<string, string>>, res, next) => {

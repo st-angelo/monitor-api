@@ -4,7 +4,7 @@ const prisma = new PrismaClient();
 
 async function main() {
   // Currency
-  const _currencies = [{ code: 'RON' }, { code: 'EUR' }, { code: 'USD' }];
+  const _currencies = [{ code: 'RON', implicit: true }, { code: 'EUR' }, { code: 'USD' }];
   await prisma.currency.deleteMany();
   await prisma.currency.createMany({
     data: _currencies,
