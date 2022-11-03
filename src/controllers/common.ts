@@ -12,6 +12,7 @@ export const getSortingOptions = (query: Record<string, string>) => {
   const options: Record<string, string>[] = [];
 
   if ($orderBy) options.push({ [$orderBy]: $direction || 'asc' });
+  options.push({ id: 'desc' });
 
   return options;
 };

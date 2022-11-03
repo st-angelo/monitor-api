@@ -7,23 +7,23 @@ class TransactionDto {
   typeId: string;
   amount: number;
   date: Date;
-  currency: CurrencyDto;
-  category: CategoryDto;
+  currency?: CurrencyDto;
+  category?: CategoryDto;
   isRecurrent?: boolean;
 
   constructor(
     transaction: Transaction & {
-      type: TransactionType;
-      currency: Currency;
-      category: Category;
+      type?: TransactionType;
+      currency?: Currency;
+      category?: Category;
     }
   ) {
     this.id = transaction.id;
-    this.typeId = transaction.type.id;
+    this.typeId = transaction.typeId;
     this.amount = transaction.amount;
     this.date = transaction.date;
-    this.currency = new CurrencyDto(transaction.currency);
-    this.category = new CategoryDto(transaction.category);
+    this.currency = transaction.currency && new CurrencyDto(transaction.currency);
+    this.category = transaction.category && new CategoryDto(transaction.category);
     this.isRecurrent = transaction.isRecurrent;
   }
 }

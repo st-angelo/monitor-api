@@ -1,10 +1,12 @@
 import { getPaginationOptions, getSortingOptions } from '../common';
 
 export const getCategoryFilterOptions = (query: Record<string, string>) => {
-  const { name } = query;
+  const { name, description, transactionTypeId } = query;
   const options: Record<string, unknown> = {};
 
   if (name) options.name = { contains: name };
+  if (description) options.description = { contains: description };
+  if (transactionTypeId) options.transactionTypeId = transactionTypeId;
 
   return options;
 };

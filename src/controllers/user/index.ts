@@ -32,20 +32,13 @@ export const updatePassword = catchAsync(async (req: Request<UpdatePasswordBody>
 });
 
 export const getMiscellaneousInfo = catchAsync(async (req, res, next) => {
-  const [lastTransaction, implicitTransactionType, implicitCurrency] = await prisma.$transaction([
-    prisma.transaction.findFirst({
-      where: { userId: req.user.id },
-      select: { currencyId: true, typeId: true },
-      orderBy: { added: 'desc' },
-    }),
+  const [implicitTransactionType, implicitCurrency] = await prisma.$transaction([
     prisma.transactionType.findFirst({ where: { implicit: true }, select: { id: true } }),
     prisma.currency.findFirst({ where: { implicit: true }, select: { id: true } }),
   ]);
 
   res.status(200).json({
-    lastTransactionTypeId: lastTransaction?.typeId,
     implicitTransactionTypeId: implicitTransactionType?.id,
-    lastCurrencyId: lastTransaction?.currencyId,
     implicitCurrencyId: implicitCurrency?.id,
   });
 });
@@ -54,6 +47,7 @@ export const getMiscellaneousInfo = catchAsync(async (req, res, next) => {
 
 export const getCategories = catchAsync(async (req: Request<any, Record<string, string>>, res, next) => {
   const { filters, orderBy, skip, take } = getCategoryOptions(req.query);
+
   const [total, categories] = await prisma.$transaction([
     prisma.category.count({ where: { userId: req.user.id, ...filters } }),
     prisma.category.findMany({ where: { userId: req.user.id, ...filters }, orderBy, skip, take }),
@@ -75,7 +69,7 @@ export const getCategory = catchAsync(async (req, res, next) => {
 
 export const addCategory = catchAsync(async (req: Request<AddCategoryBody>, res, next) => {
   const { name, description, color, transactionTypeId } = req.body;
-
+  console.log(req.body, req.user);
   const category = await prisma.category.create({
     data: {
       name,
@@ -107,12 +101,12 @@ export const updateCategory = catchAsync(async (req: Request<UpdateCategoryBody>
 });
 
 export const deleteCategory = catchAsync(async (req, res, next) => {
-  await prisma.$transaction([
+  const [, category] = await prisma.$transaction([
     prisma.transaction.deleteMany({ where: { categoryId: req.params.id } }),
     prisma.category.delete({ where: { id: req.params.id } }),
   ]);
 
-  res.status(204);
+  res.status(200).json(new CategoryDto(category));
 });
 
 // #endregion

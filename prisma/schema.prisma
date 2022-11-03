@@ -53,6 +53,7 @@ model Transaction {
   type        TransactionType @relation(fields: [typeId], references: [id])
   amount      Int
   date        DateTime
+  description String?
   added       DateTime        @default(now())
   currencyId  String
   currency    Currency        @relation(fields: [currencyId], references: [id])

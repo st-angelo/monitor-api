@@ -93,5 +93,5 @@ export const deleteTransaction = catchAsync(async (req: Request, res, next) => {
 
   if (!transaction) return next(new AppError(`Could not delete transaction with id ${req.params.id}`, 404));
 
-  res.status(204);
+  res.status(200).json(new TransactionDto(transaction));
 });
