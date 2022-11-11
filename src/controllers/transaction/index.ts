@@ -1,9 +1,10 @@
 import TransactionDto from '../../data/dto/transactionDto';
 import prisma from '../../data/prisma';
+import transactionService from '../../services/transactionService';
 import { AppError } from '../../utils/appError';
 import { catchAsync } from '../../utils/catchAsync';
 import { TypedRequest as Request } from '../common';
-import { getTransactionOptions } from './common';
+import { getTransactionFilterOptions, getTransactionOptions } from './common';
 import { AddTransactionBody, UpdateTransactionBody } from './metadata';
 
 export const getTransactions = catchAsync(async (req: Request<any, Record<string, string>>, res, next) => {
@@ -12,7 +13,7 @@ export const getTransactions = catchAsync(async (req: Request<any, Record<string
   const [total, transactions] = await prisma.$transaction([
     prisma.transaction.count({ where: { userId: req.user.id, ...filters } }),
     prisma.transaction.findMany({
-      include: { type: true, currency: true, category: true },
+      include: { currency: true, category: true },
       where: { userId: req.user.id, ...filters },
       orderBy,
       skip,
@@ -26,10 +27,28 @@ export const getTransactions = catchAsync(async (req: Request<any, Record<string
   });
 });
 
+export const getTransactionsForSummary = catchAsync(async (req: Request<any, Record<string, string>>, res, next) => {
+  const userPreference = await prisma.userPreference.findUnique({ where: { userId: req.user.id }, include: { baseCurrency: true } });
+  let baseCurrency = userPreference?.baseCurrency || null;
+  if (!baseCurrency) {
+    const implicitCurrency = await prisma.currency.findFirst({ where: { implicit: true } });
+    baseCurrency = implicitCurrency;
+  }
+
+  const filters = getTransactionFilterOptions(req.query);
+
+  const transactions = await prisma.transaction.findMany({
+    where: { userId: req.user.id, ...filters },
+    include: { currency: true },
+  });
+
+  res.status(200).json(await transactionService.getTransactionsForSummary(transactions, baseCurrency?.code));
+});
+
 export const getTransaction = catchAsync(async (req: Request, res, next) => {
   const transaction = await prisma.transaction.findFirst({
     where: { id: req.params.id },
-    include: { type: true, currency: true, category: true },
+    include: { currency: true, category: true },
   });
 
   if (!transaction) return next(new AppError(`Could not find transaction with id ${req.params.id}`, 404));
@@ -51,7 +70,6 @@ export const addTransaction = catchAsync(async (req: Request<AddTransactionBody>
       isRecurrent,
     },
     include: {
-      type: true,
       currency: true,
       category: true,
     },
@@ -75,7 +93,6 @@ export const updateTransaction = catchAsync(async (req: Request<UpdateTransactio
       id: req.params.id,
     },
     include: {
-      type: true,
       currency: true,
       category: true,
     },

@@ -4,6 +4,6 @@ export enum CacheKeyPrefix {
   ExchangeRates = 'ExchangeRates',
 }
 
-// Set the individual timeout for each key to 12h, after which they are deleted
-const cache = new NodeCache({ stdTTL: 3600 * 12 });
+// Set the individual timeout for each key to infinite
+const cache = new NodeCache({ stdTTL: 0 });
 export default cache;

@@ -31,18 +31,20 @@ model User {
 }
 
 model UserPreference {
-  id             String @id @default(uuid())
+  id             String   @id @default(uuid())
   baseCurrencyId String
-  userId         String @unique
-  user           User   @relation(fields: [userId], references: [id])
+  baseCurrency   Currency @relation(fields: [baseCurrencyId], references: [id])
+  userId         String   @unique
+  user           User     @relation(fields: [userId], references: [id])
 }
 
 model Currency {
-  id          String        @id @default(uuid())
-  code        String        @unique
-  implicit    Boolean       @default(false)
-  active      Boolean       @default(true)
-  Transaction Transaction[]
+  id             String           @id @default(uuid())
+  code           String           @unique
+  implicit       Boolean          @default(false)
+  active         Boolean          @default(true)
+  Transaction    Transaction[]
+  UserPreference UserPreference[]
 
   @@index([code])
 }

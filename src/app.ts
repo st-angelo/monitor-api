@@ -9,6 +9,7 @@ import xss from 'xss-clean';
 import globalErrorHandler from './controllers/error';
 import authenticationRouter from './routers/authenticationRouter.js';
 import dictionaryRouter from './routers/dictionaryRouter';
+import miscellaneousRouter from './routers/miscellaneousRouter';
 import transactionRouter from './routers/transactionRouter.js';
 import userRouter from './routers/userRouter.js';
 import { AppError } from './utils/appError.js';
@@ -59,6 +60,7 @@ app.use('/api/v1', authenticationRouter);
 app.use('/api/v1/user', userRouter);
 app.use('/api/v1/transaction', transactionRouter);
 app.use('/api/v1/dictionary', dictionaryRouter);
+app.use('/api/v1/miscellaneous', miscellaneousRouter);
 
 app.all('*', (req, _, next) => {
   next(new AppError(`Can't find ${req.originalUrl}`, 404));

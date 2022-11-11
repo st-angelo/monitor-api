@@ -1,4 +1,4 @@
-import { Category, Currency, Transaction, TransactionType } from '@prisma/client';
+import { Category, Currency, Transaction } from '@prisma/client';
 import CategoryDto from './categoryDto';
 import CurrencyDto from './currencyDto';
 
@@ -13,7 +13,6 @@ class TransactionDto {
 
   constructor(
     transaction: Transaction & {
-      type?: TransactionType;
       currency?: Currency;
       category?: Category;
     }
