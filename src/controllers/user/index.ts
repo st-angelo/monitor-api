@@ -1,16 +1,18 @@
 import bcrypt from 'bcryptjs';
 import CategoryDto from '../../data/dto/categoryDto';
 import prisma from '../../data/prisma';
+import { uploadAvatar } from '../../services/cloudinaryService';
 import { AppError } from '../../utils/appError';
+import cache, { CacheKeyPrefix } from '../../utils/cache';
 import { catchAsync } from '../../utils/catchAsync';
 import { correctPassword, createAndSendToken } from '../authentication/common';
 import { TypedRequest as Request } from '../common';
 import { getCategoryOptions } from './common';
-import { AddCategoryBody, UpdateCategoryBody, UpdatePasswordBody } from './metadata';
+import { AddCategoryBody, UpdateAccountData, UpdateCategoryBody, UpdatePasswordBody } from './metadata';
 
 export const updatePassword = catchAsync(async (req: Request<UpdatePasswordBody>, res, next) => {
   // 1. Get user from collection
-  const user = await prisma.user.findFirst({ where: { id: req.user.id } });
+  const user = await prisma.user.findFirst({ where: { id: req.user.id }, include: { UserPreference: true } });
   if (!user) return next(new AppError('User could not be found', 401));
 
   // 2. Check if POSTed password is correct
@@ -28,6 +30,32 @@ export const updatePassword = catchAsync(async (req: Request<UpdatePasswordBody>
   });
 
   // 4. Log in user, send JWT
+  createAndSendToken(user, 200, res);
+});
+
+export const updateAccountData = catchAsync(async (req: Request<UpdateAccountData>, res, next) => {
+  const { name, nickname, baseCurrencyId } = req.body;
+
+  let avatarUrl = req.user.avatarUrl;
+  if (req.file) {
+    avatarUrl = await uploadAvatar(req.file);
+  }
+
+  const user = await prisma.user.update({
+    data: {
+      name,
+      nickname,
+      avatarUrl,
+      UserPreference: { update: { baseCurrencyId } },
+    },
+    where: {
+      id: req.user.id,
+    },
+    include: {
+      UserPreference: true
+    }
+  });
+
   createAndSendToken(user, 200, res);
 });
 
@@ -68,6 +96,8 @@ export const addCategory = catchAsync(async (req: Request<AddCategoryBody>, res,
     },
   });
 
+  cache.del(`${CacheKeyPrefix.UserCategories}_${req.user.id}`);
+
   res.status(200).json(new CategoryDto(category));
 });
 
@@ -84,6 +114,8 @@ export const updateCategory = catchAsync(async (req: Request<UpdateCategoryBody>
       id: req.params.id,
     },
   });
+
+  cache.del(`${CacheKeyPrefix.UserCategories}_${req.user.id}`);
 
   res.status(200).json(new CategoryDto(category));
 });

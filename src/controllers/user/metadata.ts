@@ -15,3 +15,9 @@ export interface UpdateCategoryBody {
   description?: string;
   color?: string;
 }
+
+export interface UpdateAccountData {
+  name: string;
+  nickname: string;
+  baseCurrencyId: string;
+}

@@ -2,17 +2,17 @@ import { User } from '@prisma/client';
 
 class UserDto {
   id: string;
-  firstName: string;
-  lastName: string;
+  name: string;
+  nickname: string | null;
   email: string;
-  photoUrl: string | null;
+  avatarUrl: string | null;
 
   constructor(user: User) {
     this.id = user.id;
-    this.firstName = user.firstName;
-    this.lastName = user.lastName;
+    this.name = user.name;
+    this.nickname = user.nickname;
     this.email = user.email;
-    this.photoUrl = user.photoUrl;
+    this.avatarUrl = user.avatarUrl;
   }
 }
 

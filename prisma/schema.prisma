@@ -14,11 +14,11 @@ datasource db {
 
 model User {
   id                   String          @id @default(uuid())
-  firstName            String
-  lastName             String
+  name                 String
+  nickname             String?
   email                String          @unique
   role                 UserRole        @default(User)
-  photoUrl             String?
+  avatarUrl            String?
   password             String
   passwordChangedAt    DateTime?
   passwordResetToken   String?
@@ -53,7 +53,7 @@ model Transaction {
   id          String          @id @default(uuid())
   typeId      String
   type        TransactionType @relation(fields: [typeId], references: [id])
-  amount      Int
+  amount      Float
   date        DateTime
   description String?
   added       DateTime        @default(now())

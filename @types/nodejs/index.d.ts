@@ -14,5 +14,8 @@ declare module NodeJS {
     REFRESH_TOKEN: string;
     ACCESS_TOKEN: string;
     CURRENCY_API_URL: string;
+    CLOUDINARY_CLOUD_NAME: string;
+    CLOUDINARY_API_KEY: string;
+    CLOUDINARY_API_SECRET: string;
   }
 }

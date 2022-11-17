@@ -30,7 +30,7 @@ export const getCategories = catchAsync(async (req: Request, res, next) => {
 });
 
 export const getCurrencies = catchAsync(async (req, res, next) => {
-  let currencies = cache.get<Currency[]>(CacheKeyPrefix.TransactionTypes);
+  let currencies = cache.get<Currency[]>(CacheKeyPrefix.Currencies);
 
   if (!currencies) {
     currencies = await prisma.currency.findMany({ where: { active: true } });

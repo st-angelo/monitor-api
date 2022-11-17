@@ -12,17 +12,23 @@ import { correctPassword, createAndSendToken, userChangedPasswordAfter, userNotF
 import { ForgotPasswordBody, LoginBody, ResetPasswordBody, SignupBody } from './metadata.js';
 
 export const signup = catchAsync(async (req: Request<SignupBody>, res, next) => {
-  const { firstName, lastName, email, password } = req.body;
+  const { name, email, password } = req.body;
 
   const existing = await prisma.user.count({ where: { email } });
   if (existing > 0) return next(new AppError('A user with this email already exists', 409));
 
+  const implicitCurrency = await prisma.currency.findFirst({ where: { implicit: true } });
+  if (!implicitCurrency) return next(new AppError('An implicit currency is not configured', 409));
+
   const newUser = await prisma.user.create({
     data: {
-      firstName,
-      lastName,
+      name,
       email,
       password: await bcrypt.hash(password, 12),
+      UserPreference: { create: { baseCurrencyId: implicitCurrency.id } },
+    },
+    include: {
+      UserPreference: true,
     },
   });
 
@@ -36,7 +42,7 @@ export const signin = catchAsync(async (req: Request<LoginBody>, res, next) => {
   if (!email || !password) return next(new AppError('Please provide email and password!', 400));
 
   // 2. Check if user exists && password is correct
-  const user = await prisma.user.findFirst({ where: { email } });
+  const user = await prisma.user.findFirst({ where: { email }, include: { UserPreference: true } });
 
   if (!user || !(await correctPassword(password, user.password))) return next(new AppError('Incorrect email or password!', 401));
 
@@ -128,7 +134,10 @@ export const resetPassword = catchAsync(async (req: Request<ResetPasswordBody>, 
   // 1. Get user based on the token
   const hashedToken = crypto.createHash('sha256').update(req.params.token).digest('hex');
 
-  const user = await prisma.user.findFirst({ where: { passwordResetToken: hashedToken, passwordResetExpires: { gt: new Date() } } });
+  const user = await prisma.user.findFirst({
+    where: { passwordResetToken: hashedToken, passwordResetExpires: { gt: new Date() } },
+    include: { UserPreference: true },
+  });
 
   // 2. If token has not expired, and there is user, set the new password
   if (!user) return next(new AppError('Token is invalid or has expired', 400));

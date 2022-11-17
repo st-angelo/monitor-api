@@ -1,4 +1,4 @@
-import { User } from '@prisma/client';
+import { User, UserPreference } from '@prisma/client';
 import bcrypt from 'bcryptjs';
 import { format } from 'date-fns';
 import { NextFunction, Response } from 'express';
@@ -6,12 +6,23 @@ import jwt from 'jsonwebtoken';
 import UserDto from '../../data/dto/userDto.js';
 import { AppError } from '../../utils/appError.js';
 
-export const signToken = ({ id, firstName, lastName, photoUrl }: User): string =>
-  jwt.sign({ id, firstName, lastName, photoUrl }, process.env.JWT_SECRET, {
-    expiresIn: process.env.JWT_EXPIRES_IN,
-  });
+export const signToken = ({
+  id,
+  name,
+  nickname,
+  email,
+  avatarUrl,
+  UserPreference,
+}: User & { UserPreference: UserPreference | null }): string =>
+  jwt.sign(
+    { id, name, nickname, email, avatarUrl, preferences: { baseCurrencyId: UserPreference?.baseCurrencyId } },
+    process.env.JWT_SECRET,
+    {
+      expiresIn: process.env.JWT_EXPIRES_IN,
+    }
+  );
 
-export const createAndSendToken = (user: User, statusCode: number, res: Response) => {
+export const createAndSendToken = (user: User & { UserPreference: UserPreference | null }, statusCode: number, res: Response) => {
   const token = signToken(user);
   res.status(statusCode).json({
     token,
