@@ -13,6 +13,8 @@ declare module NodeJS {
     CLIENT_SECRET: string;
     REFRESH_TOKEN: string;
     ACCESS_TOKEN: string;
+    SENDGRID_USERNAME: string;
+    SENDGRID_PASSWORD: string;
     CURRENCY_API_URL: string;
     CLOUDINARY_CLOUD_NAME: string;
     CLOUDINARY_API_KEY: string;

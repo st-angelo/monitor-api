@@ -22,7 +22,7 @@ app.use(helmet());
 
 const corsOrigin = [];
 if (process.env.ENVIRONMENT === 'development') corsOrigin.push('http://127.0.0.1:3000');
-if (process.env.ENVIRONMENT === 'production') corsOrigin.push('https://unique-bublanina-f2a817.netlify.app');
+if (process.env.ENVIRONMENT === 'production') corsOrigin.push('https://kl-monitor.netlify.app/');
 
 // Cors
 app.use(

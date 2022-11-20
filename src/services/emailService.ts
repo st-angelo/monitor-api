@@ -10,16 +10,10 @@ interface SendEmailOptions {
 const sendEmail = async (options: SendEmailOptions) => {
   // 1. Create a transporter
   const transporter = nodemailer.createTransport({
-    host: 'smtp.gmail.com',
-    port: 465,
-    secure: true,
+    service: 'SendGrid',
     auth: {
-      type: 'OAuth2',
-      user: 'monitor.newsbringer@gmail.com',
-      clientId: process.env.CLIENT_ID,
-      clientSecret: process.env.CLIENT_SECRET,
-      refreshToken: process.env.REFRESH_TOKEN,
-      accessToken: process.env.ACCESS_TOKEN,
+      user: process.env.SENDGRID_USERNAME,
+      pass: process.env.SENDGRID_PASSWORD,
     },
   });
 
