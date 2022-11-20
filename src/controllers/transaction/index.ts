@@ -5,7 +5,7 @@ import { AppError } from '../../utils/appError';
 import { catchAsync } from '../../utils/catchAsync';
 import { TypedRequest as Request } from '../common';
 import { getTransactionFilterOptions, getTransactionOptions } from './common';
-import { AddTransactionBody, UpdateTransactionBody } from './metadata';
+import { AddTransactionBody, DeleteTransactionsBody, UpdateTransactionBody } from './metadata';
 
 export const getTransactions = catchAsync(async (req: Request<any, Record<string, string>>, res, next) => {
   const { filters, orderBy, skip, take } = getTransactionOptions(req.query);
@@ -110,5 +110,21 @@ export const deleteTransaction = catchAsync(async (req: Request, res, next) => {
 
   if (!transaction) return next(new AppError(`Could not delete transaction with id ${req.params.id}`, 404));
 
-  res.status(200).json(new TransactionDto(transaction));
+  res.status(200).json({ status: 'success' });
+});
+
+export const deleteTransactions = catchAsync(async (req: Request<DeleteTransactionsBody>, res, next) => {
+  const { ids } = req.body;
+  
+  const deleted = await prisma.transaction.deleteMany({
+    where: {
+      id: {
+        in: ids
+      }
+    },
+  });
+
+  if (deleted.count !== ids.length) return next(new AppError('Could not delete transaction(s).', 404));
+
+  res.status(200).json({ status: 'success' });
 });

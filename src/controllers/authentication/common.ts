@@ -1,6 +1,6 @@
 import { User, UserPreference } from '@prisma/client';
 import bcrypt from 'bcryptjs';
-import { format } from 'date-fns';
+import { addDays, format } from 'date-fns';
 import { NextFunction, Response } from 'express';
 import jwt from 'jsonwebtoken';
 import UserDto from '../../data/dto/userDto.js';
@@ -9,13 +9,9 @@ import { AppError } from '../../utils/appError.js';
 export const signToken = ({
   id,
   name,
-  nickname,
-  email,
-  avatarUrl,
-  UserPreference,
-}: User & { UserPreference: UserPreference | null }): string =>
+}: User): string =>
   jwt.sign(
-    { id, name, nickname, email, avatarUrl, preferences: { baseCurrencyId: UserPreference?.baseCurrencyId } },
+    { id, name},
     process.env.JWT_SECRET,
     {
       expiresIn: process.env.JWT_EXPIRES_IN,
@@ -24,10 +20,14 @@ export const signToken = ({
 
 export const createAndSendToken = (user: User & { UserPreference: UserPreference | null }, statusCode: number, res: Response) => {
   const token = signToken(user);
-  res.status(statusCode).json({
-    token,
-    user: new UserDto(user),
+
+  res.cookie('jwt', token, {
+    expires: addDays(Date.now(), process.env.JWT_COOKIE_EXPIRES_IN),
+    secure: process.env.ENVIRONMENT === 'production',
+    httpOnly: true,
   });
+
+  res.status(statusCode).json(new UserDto(user));
 };
 
 export const userChangedPasswordAfter = (user: User, jwtTimestamp: number): boolean => {

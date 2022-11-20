@@ -7,6 +7,7 @@ import {
   getTransaction,
   getTransactions,
   updateTransaction,
+  deleteTransactions,
 } from '../controllers/transaction';
 
 const router = Router();
@@ -14,7 +15,7 @@ const router = Router();
 // Protect all routes that come after this middleware use
 router.use(protect);
 
-router.route('/').get(getTransactions).post(addTransaction);
+router.route('/').get(getTransactions).post(addTransaction).delete(deleteTransactions);
 
 router.route('/summary').get(getTransactionsForSummary);
 

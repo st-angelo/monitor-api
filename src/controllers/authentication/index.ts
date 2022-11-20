@@ -1,6 +1,6 @@
 import bcrypt from 'bcryptjs';
 import crypto from 'crypto';
-import { add } from 'date-fns';
+import { add, addSeconds } from 'date-fns';
 import { NextFunction, Response } from 'express';
 import prisma from '../../data/prisma.js';
 import sendEmail from '../../services/emailService.js';
@@ -50,12 +50,22 @@ export const signin = catchAsync(async (req: Request<LoginBody>, res, next) => {
   createAndSendToken(user, 200, res);
 });
 
+export const signOut = (req: Request, res: Response, next: NextFunction) => {
+  res.cookie('jwt', 'signed out', {
+    expires: addSeconds(Date.now(), 5),
+    httpOnly: true,
+  });
+  res.status(200).json({ status: 'success' });
+};
+
 export const protect = catchAsync(async (req: Request, res, next) => {
   // 1. Getting token and check if exists
   let token: string | null = null;
   const { authorization } = req.headers;
   if (authorization && authorization.startsWith('Bearer')) {
     [, token] = authorization.split(' ').map(x => x.trim());
+  } else if (req.cookies.jwt) {
+    token = req.cookies.jwt;
   }
 
   if (!token) return next(new AppError('You are not logged in! Please login to get access', 401));
@@ -64,7 +74,7 @@ export const protect = catchAsync(async (req: Request, res, next) => {
   const decoded = await verifyJWT(token, process.env.JWT_SECRET);
 
   // 3. Check if user still exists
-  const user = await prisma.user.findFirst({ where: { id: String(decoded.id) } });
+  const user = await prisma.user.findUnique({ where: { id: String(decoded.id) }, include: { UserPreference: true } });
   if (!user) return next(new AppError('The user belonging to the token no longer exists', 401));
 
   // 4. Check if user changed password after the JWT was issued

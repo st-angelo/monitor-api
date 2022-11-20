@@ -6,6 +6,7 @@ import {
   deleteCategory,
   getCategories,
   getCategory,
+  getUser,
   updateAccountData,
   updateCategory,
   updatePassword,
@@ -15,6 +16,8 @@ const router = Router();
 
 // Protect all routes that come after this middleware use
 router.use(protect);
+
+router.get('/', getUser);
 
 router.patch('/updatePassword', updatePassword);
 

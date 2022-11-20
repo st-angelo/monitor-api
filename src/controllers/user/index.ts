@@ -1,5 +1,7 @@
 import bcrypt from 'bcryptjs';
+import { NextFunction, Response } from 'express';
 import CategoryDto from '../../data/dto/categoryDto';
+import UserDto from '../../data/dto/userDto';
 import prisma from '../../data/prisma';
 import { uploadAvatar } from '../../services/cloudinaryService';
 import { AppError } from '../../utils/appError';
@@ -9,6 +11,10 @@ import { correctPassword, createAndSendToken } from '../authentication/common';
 import { TypedRequest as Request } from '../common';
 import { getCategoryOptions } from './common';
 import { AddCategoryBody, UpdateAccountData, UpdateCategoryBody, UpdatePasswordBody } from './metadata';
+
+export const getUser = (req: Request, res: Response, next: NextFunction) => {
+  res.status(200).json(new UserDto(req.user));
+};
 
 export const updatePassword = catchAsync(async (req: Request<UpdatePasswordBody>, res, next) => {
   // 1. Get user from collection
@@ -52,11 +58,11 @@ export const updateAccountData = catchAsync(async (req: Request<UpdateAccountDat
       id: req.user.id,
     },
     include: {
-      UserPreference: true
-    }
+      UserPreference: true,
+    },
   });
 
-  createAndSendToken(user, 200, res);
+  res.status(200).json({ status: 'success' });
 });
 
 // #region Category
