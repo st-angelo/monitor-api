@@ -10,9 +10,12 @@ import {
   updateAccountData,
   updateCategory,
   updatePassword,
+  verify,
 } from '../controllers/user';
 
 const router = Router();
+
+router.get('/verify', verify);
 
 // Protect all routes that come after this middleware use
 router.use(protect);

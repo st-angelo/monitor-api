@@ -21,3 +21,8 @@ export interface UpdateAccountData {
   nickname: string;
   baseCurrencyId: string;
 }
+
+export type VerifyUserParams = {
+  email: string;
+  token: string;
+}

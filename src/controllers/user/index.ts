@@ -1,4 +1,5 @@
 import bcrypt from 'bcryptjs';
+import crypto from 'crypto';
 import { NextFunction, Response } from 'express';
 import CategoryDto from '../../data/dto/categoryDto';
 import UserDto from '../../data/dto/userDto';
@@ -10,11 +11,33 @@ import { catchAsync } from '../../utils/catchAsync';
 import { correctPassword, createAndSendToken } from '../authentication/common';
 import { TypedRequest as Request } from '../common';
 import { getCategoryOptions } from './common';
-import { AddCategoryBody, UpdateAccountData, UpdateCategoryBody, UpdatePasswordBody } from './metadata';
+import { AddCategoryBody, UpdateAccountData, UpdateCategoryBody, UpdatePasswordBody, VerifyUserParams } from './metadata';
 
 export const getUser = (req: Request, res: Response, next: NextFunction) => {
   res.status(200).json(new UserDto(req.user));
 };
+
+export const verify = catchAsync(async (req: Request<any, VerifyUserParams>, res, next) => {
+  const { email, token } = req.query;
+
+  const verifyToken = crypto.createHash('sha256').update(token).digest('hex');
+
+  const user = await prisma.user.findFirst({ where: { email, verifyToken }, select: { isVerified: true } });
+  if (!user) return next(new AppError('This user cannot be verified. Please contact our support.', 404));
+
+  if (!user.isVerified) {
+    await prisma.user.update({
+      data: {
+        isVerified: true,
+      },
+      where: {
+        email,
+      },
+    });
+  }
+
+  res.redirect(process.env.CLIENT_URL);
+});
 
 export const updatePassword = catchAsync(async (req: Request<UpdatePasswordBody>, res, next) => {
   // 1. Get user from collection

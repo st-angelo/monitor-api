@@ -1,0 +1,18 @@
+extends base
+
+block content
+  p.title Confirm Your Email Address
+  p Welcome, #[span.bold #{name}]! We're glad to have you on board 🎉 To access #[a(href=`${homeUrl}`, target='_blank').accent Monitor]'s full features you need to verify your email by clicking the link below.
+  table.btn.btn-primary(role='presentation', border='0', cellpadding='0', cellspacing='0')
+    tbody
+      tr
+        td(align='center')
+          table(role='presentation', border='0', cellpadding='0', cellspacing='0')
+            tbody
+              tr
+                td
+                  a(href=`${verifyUrl}`, target='_blank') Verify your email
+  p Come see what we've prepared for you!
+  span Cheers,
+  br
+  span.accent Monitor Team

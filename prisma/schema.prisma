@@ -18,11 +18,13 @@ model User {
   nickname             String?
   email                String          @unique
   role                 UserRole        @default(User)
+  isVerified           Boolean         @default(false)
   avatarUrl            String?
   password             String
   passwordChangedAt    DateTime?
   passwordResetToken   String?
   passwordResetExpires DateTime?
+  verifyToken          String?
   UserPreference       UserPreference?
   Category             Category[]
   Transaction          Transaction[]
@@ -50,20 +52,21 @@ model Currency {
 }
 
 model Transaction {
-  id          String          @id @default(uuid())
-  typeId      String
-  type        TransactionType @relation(fields: [typeId], references: [id])
-  amount      Float
-  date        DateTime
-  description String?
-  added       DateTime        @default(now())
-  currencyId  String
-  currency    Currency        @relation(fields: [currencyId], references: [id])
-  categoryId  String
-  category    Category        @relation(fields: [categoryId], references: [id])
-  userId      String
-  user        User            @relation(fields: [userId], references: [id])
-  isRecurrent Boolean         @default(false)
+  id             String          @id @default(uuid())
+  typeId         String
+  type           TransactionType @relation(fields: [typeId], references: [id])
+  amount         Float
+  date           DateTime
+  description    String?
+  added          DateTime        @default(now())
+  currencyId     String
+  currency       Currency        @relation(fields: [currencyId], references: [id])
+  categoryId     String
+  category       Category        @relation(fields: [categoryId], references: [id])
+  userId         String
+  user           User            @relation(fields: [userId], references: [id])
+  isRecurrent    Boolean         @default(false)
+  recurrenceType RecurrenceType?
 }
 
 model Category {
@@ -93,4 +96,10 @@ model TransactionType {
 // Enums
 enum UserRole {
   User
+}
+
+enum RecurrenceType {
+  Weekly
+  Monthly
+  Yearly
 }

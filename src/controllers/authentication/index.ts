@@ -3,7 +3,7 @@ import crypto from 'crypto';
 import { add, addSeconds } from 'date-fns';
 import { NextFunction, Response } from 'express';
 import prisma from '../../data/prisma.js';
-import sendEmail from '../../services/emailService.js';
+import { sendResetPasswordEmail, sendWelcomeEmail } from '../../services/emailService.js';
 import { AppError } from '../../utils/appError.js';
 import { catchAsync } from '../../utils/catchAsync.js';
 import { verifyJWT } from '../../utils/jwtHelpers.js';
@@ -20,17 +20,24 @@ export const signup = catchAsync(async (req: Request<SignupBody>, res, next) => 
   const implicitCurrency = await prisma.currency.findFirst({ where: { implicit: true } });
   if (!implicitCurrency) return next(new AppError('An implicit currency is not configured', 409));
 
+  // The verify token will be sent with the email to confirm identity
+  const verifyToken = crypto.randomBytes(32).toString('hex');
+
   const newUser = await prisma.user.create({
     data: {
       name,
       email,
       password: await bcrypt.hash(password, 12),
+      verifyToken: crypto.createHash('sha256').update(verifyToken).digest('hex'),
       UserPreference: { create: { baseCurrencyId: implicitCurrency.id } },
     },
     include: {
       UserPreference: true,
     },
   });
+
+  const hostUrl = `${req.protocol}://${req.get('host')}`;
+  await sendWelcomeEmail(newUser, verifyToken, hostUrl);
 
   createAndSendToken(newUser, 201, res);
 });
@@ -111,16 +118,8 @@ export const forgotPassword = catchAsync(async (req: Request<ForgotPasswordBody>
   });
 
   // 3. Send it to user's email
-  const resetURL = `${req.protocol}://${req.get('host')}/api/v1/resetPassword/${resetToken}`;
-
-  const message = `Forgot your password? Submit a PATCH request with your new password and passwordConfirm to ${resetURL}\nIf you didn't forget your password, please ignore this message.`;
-
   try {
-    await sendEmail({
-      email: user.email,
-      subject: 'Your password reset token (valid for 10 min)',
-      message,
-    });
+    await sendResetPasswordEmail(user, resetToken, `${req.protocol}://${req.get('host')}`);
 
     res.status(200).json({
       message: 'Token sent to email!',

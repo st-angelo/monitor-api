@@ -3,6 +3,7 @@ declare module NodeJS {
     ENVIRONMENT: string;
     PORT: string;
     EMAIL: string;
+    CLIENT_URL: string;
     DATABASE_URL: string;
     JWT_SECRET: string;
     JWT_EXPIRES_IN: string;
