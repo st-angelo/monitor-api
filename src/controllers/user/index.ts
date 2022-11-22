@@ -114,7 +114,7 @@ export const getCategory = catchAsync(async (req, res, next) => {
 
 export const addCategory = catchAsync(async (req: Request<AddCategoryBody>, res, next) => {
   const { name, description, color, transactionTypeId } = req.body;
-  console.log(req.body, req.user);
+
   const category = await prisma.category.create({
     data: {
       name,

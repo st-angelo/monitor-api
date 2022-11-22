@@ -36,8 +36,7 @@ export const signup = catchAsync(async (req: Request<SignupBody>, res, next) => 
     },
   });
 
-  const hostUrl = `${req.protocol}://${req.get('host')}`;
-  await sendWelcomeEmail(newUser, verifyToken, hostUrl);
+  await sendWelcomeEmail(newUser, verifyToken, `${req.protocol}://${req.get('host')}`);
 
   createAndSendToken(newUser, 201, res);
 });
@@ -119,7 +118,7 @@ export const forgotPassword = catchAsync(async (req: Request<ForgotPasswordBody>
 
   // 3. Send it to user's email
   try {
-    await sendResetPasswordEmail(user, resetToken, `${req.protocol}://${req.get('host')}`);
+    await sendResetPasswordEmail(user, resetToken);
 
     res.status(200).json({
       message: 'Token sent to email!',

@@ -78,6 +78,7 @@ async function main() {
   await prisma.transactionType.create({
     data: {
       code: 'Spending',
+      implicit: true,
       Category: { createMany: { data: _spendingCategories } },
     },
   });

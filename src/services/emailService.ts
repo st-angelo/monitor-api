@@ -72,12 +72,12 @@ export const sendWelcomeEmail = async ({ name, nickname, email }: User, token: s
   });
 };
 
-export const sendResetPasswordEmail = async ({ name, nickname, email }: User, token: string, hostUrl: string) => {
+export const sendResetPasswordEmail = async ({ name, nickname, email }: User, token: string) => {
   const subject = 'Reset your password';
 
   const html = pug.renderFile(`${__dirname}/resources/templates/resetPassword.pug`, {
     name: nickname ?? name,
-    resetUrl: `${hostUrl}/resetPassword?token=${token}`,
+    resetUrl: `${process.env.CLIENT_URL}/reset-password/${token}`,
     subject,
   });
 
