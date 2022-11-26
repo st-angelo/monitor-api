@@ -1,18 +1,20 @@
+import { Recurrence } from "@prisma/client";
+
 export interface AddTransactionBody {
   typeId: string;
   amount: number;
-  date: Date;
+  date: string;
   currencyId: string;
   categoryId: string;
-  isRecurrent?: boolean;
+  recurrence?: Recurrence;
 }
 
 export interface UpdateTransactionBody {
   amount: number;
-  date: Date;
+  date: string;
   currencyId: string;
   categoryId: string;
-  isRecurrent?: boolean;
+  recurrence?: Recurrence;
 }
 
 export interface DeleteTransactionsBody {

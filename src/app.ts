@@ -7,6 +7,7 @@ import hpp from 'hpp';
 import morgan from 'morgan';
 import xss from 'xss-clean';
 import globalErrorHandler from './controllers/error';
+import './cron';
 import authenticationRouter from './routers/authenticationRouter.js';
 import dictionaryRouter from './routers/dictionaryRouter';
 import miscellaneousRouter from './routers/miscellaneousRouter';

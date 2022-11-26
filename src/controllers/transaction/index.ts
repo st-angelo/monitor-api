@@ -1,3 +1,4 @@
+import { startOfDay } from 'date-fns';
 import TransactionDto from '../../data/dto/transactionDto';
 import prisma from '../../data/prisma';
 import transactionService from '../../services/transactionService';
@@ -45,6 +46,27 @@ export const getTransactionsForSummary = catchAsync(async (req: Request<any, Rec
   res.status(200).json(await transactionService.getTransactionsForSummary(transactions, baseCurrency?.code));
 });
 
+export const getLatestTransactionData = catchAsync(async (req, res, next) => {
+  const [lastTransactions, topCategories] = await prisma.$transaction([
+    prisma.transaction.findMany({ where: { userId: req.user.id }, orderBy: { added: 'desc' }, take: 3 }),
+    prisma.transaction.groupBy({
+      by: ['categoryId'],
+      _count: { categoryId: true },
+      orderBy: { _count: { categoryId: 'desc' } },
+      where: { userId: req.user.id },
+      take: 3,
+    }),
+  ]);
+
+  res.status(200).json({
+    lastTransactions: lastTransactions.map(transaction => new TransactionDto(transaction)),
+    topCategories: topCategories.map(({ categoryId, _count }) => ({
+      categoryId,
+      count: (_count as Exclude<typeof _count, true>)?.categoryId,
+    })),
+  });
+});
+
 export const getTransaction = catchAsync(async (req: Request, res, next) => {
   const transaction = await prisma.transaction.findFirst({
     where: { id: req.params.id },
@@ -57,17 +79,17 @@ export const getTransaction = catchAsync(async (req: Request, res, next) => {
 });
 
 export const addTransaction = catchAsync(async (req: Request<AddTransactionBody>, res, next) => {
-  const { typeId, amount, date, currencyId, categoryId, isRecurrent } = req.body;
+  const { typeId, amount, date, currencyId, categoryId, recurrence } = req.body;
 
   const transaction = await prisma.transaction.create({
     data: {
       typeId,
       amount,
-      date: new Date(date),
+      date: startOfDay(new Date(date)),
       currencyId,
       categoryId,
       userId: req.user.id,
-      isRecurrent,
+      recurrence,
     },
     include: {
       currency: true,
@@ -79,15 +101,15 @@ export const addTransaction = catchAsync(async (req: Request<AddTransactionBody>
 });
 
 export const updateTransaction = catchAsync(async (req: Request<UpdateTransactionBody>, res, next) => {
-  const { amount, date, currencyId, categoryId } = req.body;
+  const { amount, date, currencyId, categoryId, recurrence } = req.body;
 
   const transaction = await prisma.transaction.update({
     data: {
       amount,
-      date,
+      date: startOfDay(new Date(date)),
       currencyId,
       categoryId,
-      userId: req.user.id,
+      recurrence,
     },
     where: {
       id: req.params.id,
@@ -115,12 +137,12 @@ export const deleteTransaction = catchAsync(async (req: Request, res, next) => {
 
 export const deleteTransactions = catchAsync(async (req: Request<DeleteTransactionsBody>, res, next) => {
   const { ids } = req.body;
-  
+
   const deleted = await prisma.transaction.deleteMany({
     where: {
       id: {
-        in: ids
-      }
+        in: ids,
+      },
     },
   });
 

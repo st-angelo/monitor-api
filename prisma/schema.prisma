@@ -52,21 +52,21 @@ model Currency {
 }
 
 model Transaction {
-  id             String          @id @default(uuid())
-  typeId         String
-  type           TransactionType @relation(fields: [typeId], references: [id])
-  amount         Float
-  date           DateTime
-  description    String?
-  added          DateTime        @default(now())
-  currencyId     String
-  currency       Currency        @relation(fields: [currencyId], references: [id])
-  categoryId     String
-  category       Category        @relation(fields: [categoryId], references: [id])
-  userId         String
-  user           User            @relation(fields: [userId], references: [id])
-  isRecurrent    Boolean         @default(false)
-  recurrenceType RecurrenceType?
+  id           String          @id @default(uuid())
+  typeId       String
+  type         TransactionType @relation(fields: [typeId], references: [id])
+  amount       Float
+  date         DateTime
+  description  String?
+  added        DateTime        @default(now())
+  currencyId   String
+  currency     Currency        @relation(fields: [currencyId], references: [id])
+  categoryId   String
+  category     Category        @relation(fields: [categoryId], references: [id])
+  userId       String
+  user         User            @relation(fields: [userId], references: [id])
+  recurrence   Recurrence?
+  wasContinued Boolean?
 }
 
 model Category {
@@ -98,8 +98,9 @@ enum UserRole {
   User
 }
 
-enum RecurrenceType {
+enum Recurrence {
   Weekly
   Monthly
+  Quarterly
   Yearly
 }
