@@ -30,9 +30,7 @@ app.use(
 );
 
 // Logging
-if (process.env.ENVIRONMENT === 'development') {
-  app.use(morgan('combined'));
-}
+app.use(morgan(process.env.ENVIRONMENT === 'development' ? 'combined' : 'tiny'));
 
 // Limit requests from the same API
 app.use(

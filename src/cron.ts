@@ -1,4 +1,4 @@
-import { startOfDay, subMonths, subWeeks, subYears } from 'date-fns';
+import { format, startOfDay, subMonths, subWeeks, subYears } from 'date-fns';
 import cron from 'node-cron';
 import prisma from './data/prisma';
 
@@ -6,7 +6,7 @@ import prisma from './data/prisma';
 cron.schedule(
   '* */6 * * *',
   async () => {
-    console.info('[CRON]: Continuing recurrent transactions...');
+    console.info(`[CRON] at ${format(new Date(), 'MM-dd-HH-mm-ss')}: Continuing recurrent transactions...`);
     const now = Date.now();
     const recurrenceDates = [
       startOfDay(subWeeks(now, 1)),
@@ -28,7 +28,7 @@ cron.schedule(
       prisma.transaction.createMany({ data: transactions }),
       prisma.transaction.updateMany({ data: { wasContinued: true }, where: { id: { in: recurrentTransactions.map(({ id }) => id) } } }),
     ]);
-    console.info('[CRON]: Successful!');
+    console.info(`[CRON] at ${format(new Date(), 'MM-dd-HH-mm-ss')}: Successful!`);
   },
   { timezone: 'UTC' }
 );
