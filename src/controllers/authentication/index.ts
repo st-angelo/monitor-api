@@ -74,8 +74,6 @@ export const protect = catchAsync(async (req: Request, res, next) => {
     token = req.cookies.jwt;
   }
 
-  console.log(req, req.cookies, token, "XDDDDDDD")
-
   if (!token) return next(new AppError('You are not logged in! Please login to get access', 401));
 
   // 2. Verification token
