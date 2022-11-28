@@ -4,7 +4,7 @@ import prisma from './data/prisma';
 
 // Run this job every 3 hours
 cron.schedule(
-  '* */6 * * *',
+  '0 */6 * * *',
   async () => {
     console.info(`[CRON] at ${format(new Date(), 'MM-dd-HH-mm-ss')}: Continuing recurrent transactions...`);
     const now = Date.now();
