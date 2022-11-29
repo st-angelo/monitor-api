@@ -7,6 +7,7 @@ import {
   getCategories,
   getCategory,
   getUser,
+  resendVerificationEmail,
   updateAccountData,
   updateCategory,
   updatePassword,
@@ -19,6 +20,8 @@ router.get('/verify', verify);
 
 // Protect all routes that come after this middleware use
 router.use(protect);
+
+router.post('/resendVerificationEmail', resendVerificationEmail);
 
 router.get('/', getUser);
 

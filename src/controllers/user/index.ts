@@ -41,6 +41,25 @@ export const verify = catchAsync(async (req: Request<any, VerifyUserParams>, res
   res.redirect(process.env.CLIENT_URL);
 });
 
+export const resendVerificationEmail = catchAsync(async (req, res, next) => {
+  if (req.user.isVerified) return next();
+
+  const verifyToken = crypto.randomBytes(32).toString('hex');
+
+  const user = await prisma.user.update({
+    data: {
+      verifyToken: crypto.createHash('sha256').update(verifyToken).digest('hex'),
+    },
+    where: {
+      id: req.user.id,
+    },
+  });
+
+  await sendVerifyEmail(user, verifyToken, `${req.protocol}://${req.get('host')}`);
+
+  res.status(200).json({ status: 'success' });
+});
+
 export const updatePassword = catchAsync(async (req: Request<UpdatePasswordBody>, res, next) => {
   // 1. Get user from collection
   const user = await prisma.user.findFirst({ where: { id: req.user.id }, include: { UserPreference: true } });
