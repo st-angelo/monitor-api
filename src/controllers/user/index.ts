@@ -86,7 +86,7 @@ export const updateAccountData = catchAsync(async (req: Request<UpdateAccountDat
       nickname,
       avatarUrl,
       isVerified,
-      verifyToken,
+      verifyToken: verifyToken && crypto.createHash('sha256').update(verifyToken).digest('hex'),
       UserPreference: { update: { baseCurrencyId } },
     },
     where: {
