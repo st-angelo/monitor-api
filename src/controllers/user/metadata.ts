@@ -17,6 +17,7 @@ export interface UpdateCategoryBody {
 }
 
 export interface UpdateAccountData {
+  email: string;
   name: string;
   nickname: string;
   baseCurrencyId: string;

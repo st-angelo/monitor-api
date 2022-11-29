@@ -72,6 +72,23 @@ export const sendWelcomeEmail = async ({ name, nickname, email }: User, token: s
   });
 };
 
+export const sendVerifyEmail = async ({ name, nickname, email }: User, token: string, hostUrl: string) => {
+  const subject = 'Verify your new email';
+
+  const html = pug.renderFile(`${__dirname}/resources/templates/verifyEmail.pug`, {
+    name: nickname ?? name,
+    url: `${hostUrl}/api/v1/user/verify?email=${email}&token=${token}`,
+    subject,
+  });
+
+  await sendEmail({
+    email,
+    subject,
+    html,
+    text: htmlToText(html),
+  });
+};
+
 export const sendResetPasswordEmail = async ({ name, nickname, email }: User, token: string) => {
   const subject = 'Reset your password';
 

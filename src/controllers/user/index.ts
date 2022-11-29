@@ -5,6 +5,7 @@ import CategoryDto from '../../data/dto/categoryDto';
 import UserDto from '../../data/dto/userDto';
 import prisma from '../../data/prisma';
 import { uploadAvatar } from '../../services/cloudinaryService';
+import { sendVerifyEmail } from '../../services/emailService';
 import { AppError } from '../../utils/appError';
 import cache, { CacheKeyPrefix } from '../../utils/cache';
 import { catchAsync } from '../../utils/catchAsync';
@@ -29,6 +30,7 @@ export const verify = catchAsync(async (req: Request<any, VerifyUserParams>, res
     await prisma.user.update({
       data: {
         isVerified: true,
+        verifyToken: null,
       },
       where: {
         email,
@@ -63,27 +65,38 @@ export const updatePassword = catchAsync(async (req: Request<UpdatePasswordBody>
 });
 
 export const updateAccountData = catchAsync(async (req: Request<UpdateAccountData>, res, next) => {
-  const { name, nickname, baseCurrencyId } = req.body;
+  const { email, name, nickname, baseCurrencyId } = req.body;
 
   let avatarUrl = req.user.avatarUrl;
   if (req.file) {
     avatarUrl = await uploadAvatar(req.file);
   }
 
+  let isVerified = req.user.isVerified;
+  let verifyToken = null;
+  if (email) {
+    isVerified = false;
+    verifyToken = crypto.randomBytes(32).toString('hex');
+  }
+
   const user = await prisma.user.update({
     data: {
+      email,
       name,
       nickname,
       avatarUrl,
+      isVerified,
+      verifyToken,
       UserPreference: { update: { baseCurrencyId } },
     },
     where: {
       id: req.user.id,
     },
-    include: {
-      UserPreference: true,
-    },
   });
+
+  if (email && verifyToken) {
+    await sendVerifyEmail(user, verifyToken, `${req.protocol}://${req.get('host')}`);
+  }
 
   res.status(200).json({ status: 'success' });
 });
