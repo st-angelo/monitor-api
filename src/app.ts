@@ -8,6 +8,7 @@ import morgan from 'morgan';
 import xss from 'xss-clean';
 import globalErrorHandler from './controllers/error';
 import './cron';
+import trimmer from './middleware/trimmer';
 import authenticationRouter from './routers/authenticationRouter.js';
 import dictionaryRouter from './routers/dictionaryRouter';
 import miscellaneousRouter from './routers/miscellaneousRouter';
@@ -55,6 +56,8 @@ app.use(hpp());
 
 // Serving static files
 app.use(express.static(`${__dirname}/public`));
+
+app.use(trimmer(['body', 'params', 'query']));
 
 app.use('/api/v1', authenticationRouter);
 app.use('/api/v1/user', userRouter);

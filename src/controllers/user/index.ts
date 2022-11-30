@@ -93,7 +93,7 @@ export const updateAccountData = catchAsync(async (req: Request<UpdateAccountDat
 
   let isVerified = req.user.isVerified;
   let verifyToken = null;
-  if (email) {
+  if (email && email !== req.user.email) {
     isVerified = false;
     verifyToken = crypto.randomBytes(32).toString('hex');
   }
@@ -113,7 +113,7 @@ export const updateAccountData = catchAsync(async (req: Request<UpdateAccountDat
     },
   });
 
-  if (email && verifyToken) {
+  if (email && email !== req.user.email && verifyToken) {
     await sendVerifyEmail(user, verifyToken, `${req.protocol}://${req.get('host')}`);
   }
 
