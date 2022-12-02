@@ -79,13 +79,14 @@ export const getTransaction = catchAsync(async (req: Request, res, next) => {
 });
 
 export const addTransaction = catchAsync(async (req: Request<AddTransactionBody>, res, next) => {
-  const { typeId, amount, date, currencyId, categoryId, recurrence } = req.body;
+  const { typeId, amount, date, description, currencyId, categoryId, recurrence } = req.body;
 
   const transaction = await prisma.transaction.create({
     data: {
       typeId,
       amount,
       date: startOfDay(new Date(date)),
+      description,
       currencyId,
       categoryId,
       userId: req.user.id,
@@ -101,12 +102,13 @@ export const addTransaction = catchAsync(async (req: Request<AddTransactionBody>
 });
 
 export const updateTransaction = catchAsync(async (req: Request<UpdateTransactionBody>, res, next) => {
-  const { amount, date, currencyId, categoryId, recurrence } = req.body;
+  const { amount, date, description, currencyId, categoryId, recurrence } = req.body;
 
   const transaction = await prisma.transaction.update({
     data: {
       amount,
       date: startOfDay(new Date(date)),
+      description,
       currencyId,
       categoryId,
       recurrence,

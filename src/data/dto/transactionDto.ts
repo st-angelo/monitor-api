@@ -7,6 +7,7 @@ class TransactionDto {
   typeId: string;
   amount: number;
   date: Date;
+  description?: string;
   currencyId: string;
   currency?: CurrencyDto;
   categoryId: string;
@@ -23,6 +24,7 @@ class TransactionDto {
     this.typeId = transaction.typeId;
     this.amount = transaction.amount;
     this.date = transaction.date;
+    this.description = transaction.description ?? undefined;
     this.currencyId = transaction.currencyId;
     this.currency = transaction.currency && new CurrencyDto(transaction.currency);
     this.categoryId = transaction.categoryId;
