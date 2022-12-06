@@ -53,26 +53,30 @@ model Currency {
 }
 
 model Transaction {
-  id           String          @id @default(uuid())
-  typeId       String
-  type         TransactionType @relation(fields: [typeId], references: [id])
-  amount       Float
-  date         DateTime
-  description  String?
-  added        DateTime        @default(now())
-  currencyId   String
-  currency     Currency        @relation(fields: [currencyId], references: [id])
-  categoryId   String
-  category     Category        @relation(fields: [categoryId], references: [id])
-  userId       String
-  user         User            @relation(fields: [userId], references: [id])
-  recurrence   Recurrence?
-  wasContinued Boolean?
+  id          String          @id @default(uuid())
+  typeId      String
+  type        TransactionType @relation(fields: [typeId], references: [id])
+  amount      Float
+  date        DateTime
+  description String?
+  added       DateTime        @default(now())
+  currencyId  String
+  currency    Currency        @relation(fields: [currencyId], references: [id])
+  categoryId  String
+  category    Category        @relation(fields: [categoryId], references: [id])
+  userId      String
+  user        User            @relation(fields: [userId], references: [id])
+  recurrence  Recurrence?
+  propagated  Boolean?
+  sourceId    String?
+  source      Transaction?    @relation("source", fields: [sourceId], references: [id], onUpdate: NoAction, onDelete: NoAction)
+  Transaction Transaction[]   @relation("source")
 
   @@index([typeId])
   @@index([currencyId])
   @@index([categoryId])
   @@index([userId])
+  @@index([sourceId])
 }
 
 model Category {

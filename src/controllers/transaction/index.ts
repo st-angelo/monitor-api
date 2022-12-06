@@ -1,4 +1,3 @@
-import { startOfDay } from 'date-fns';
 import TransactionDto from '../../data/dto/transactionDto';
 import prisma from '../../data/prisma';
 import transactionService from '../../services/transactionService';
@@ -85,12 +84,12 @@ export const addTransaction = catchAsync(async (req: Request<AddTransactionBody>
     data: {
       typeId,
       amount,
-      date: startOfDay(new Date(date)),
+      date: new Date(date),
       description,
       currencyId,
       categoryId,
       userId: req.user.id,
-      recurrence,
+      recurrence
     },
     include: {
       currency: true,
@@ -104,14 +103,19 @@ export const addTransaction = catchAsync(async (req: Request<AddTransactionBody>
 export const updateTransaction = catchAsync(async (req: Request<UpdateTransactionBody>, res, next) => {
   const { amount, date, description, currencyId, categoryId, recurrence } = req.body;
 
+  const propagated = await prisma.transaction.findFirst({ where: { id: req.params.id }, select: { propagated: true } });
+  if (propagated)
+    return next(new AppError(`Cannot update a propagated transaction`, 403))
+
   const transaction = await prisma.transaction.update({
     data: {
       amount,
-      date: startOfDay(new Date(date)),
+      date: new Date(date),
       description,
       currencyId,
       categoryId,
       recurrence,
+      sourceId: !recurrence ? null : undefined
     },
     where: {
       id: req.params.id,
@@ -131,7 +135,7 @@ export const deleteTransaction = catchAsync(async (req: Request, res, next) => {
       id: req.params.id,
     },
   });
-
+ 
   if (!transaction) return next(new AppError(`Could not delete transaction with id ${req.params.id}`, 404));
 
   res.status(200).json({ status: 'success' });

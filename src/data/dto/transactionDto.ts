@@ -7,12 +7,14 @@ class TransactionDto {
   typeId: string;
   amount: number;
   date: Date;
-  description?: string;
+  description: string | null;
   currencyId: string;
   currency?: CurrencyDto;
   categoryId: string;
   category?: CategoryDto;
-  recurrence?: Recurrence;
+  recurrence: Recurrence | null;
+  propagated: boolean | null;
+  sourceId: string | null;
 
   constructor(
     transaction: Transaction & {
@@ -24,12 +26,14 @@ class TransactionDto {
     this.typeId = transaction.typeId;
     this.amount = transaction.amount;
     this.date = transaction.date;
-    this.description = transaction.description ?? undefined;
+    this.description = transaction.description;
     this.currencyId = transaction.currencyId;
     this.currency = transaction.currency && new CurrencyDto(transaction.currency);
     this.categoryId = transaction.categoryId;
     this.category = transaction.category && new CategoryDto(transaction.category);
-    this.recurrence = transaction.recurrence ?? undefined;
+    this.recurrence = transaction.recurrence;
+    this.propagated = transaction.propagated;
+    this.sourceId = transaction.sourceId;
   }
 }
 
